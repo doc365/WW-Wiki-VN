@@ -18,11 +18,13 @@ function App() {
   }, [])
 
   return (
-    <div className='bg-white dark:bg-gray-800 dark:text-white duration-200'> {/* Set background color */}
+    <><div className='bg-white dark:bg-gray-700 dark:text-white duration-200'> {/* Set background color */}
       <Navbar /> {/* Render Navbar component */}
       <Characters /> {/* Render Characters component */}
-      <Footer className='bg-gray-200' /> {/* Set fixed background color for Footer */}
-    </div>
+
+    </div><div>
+        <Footer className='bg-gray-200' /> {/* Set fixed background color for Footer */}
+      </div></>
   )
 }
 

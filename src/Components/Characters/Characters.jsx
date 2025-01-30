@@ -18,7 +18,7 @@ const CharactersData = [
     { id: 4, name: "Yinlin", image: Yinlin, atribute: "Electro", rarity: 5, weapon: "Rectifier" }, // Yinlin character data
     { id: 5, name: "Shorekeeper", image: SK, atribute: "Spectro", rarity: 5, weapon: "Sword" }, // Shorekeeper character data
     { id: 6, name: "Camellya", image: Camellya, atribute: "Havoc", rarity: 5, weapon: "Sword" }, // Camellya character data
-    { id: 7, name: "Yohu", image: Yohu, atribute: "Glacio", rarity: 4, weapon: "gauntlet" }, // Yohu character data
+    { id: 7, name: "Youhu", image: Yohu, atribute: "Glacio", rarity: 4, weapon: "gauntlet" }, // Yohu character data
 ]
 
 // Characters component
@@ -32,7 +32,7 @@ const Characters = () => {
             </div>
             <div className="flex justify-center"> {/* Center content */}
                 <div className="    bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"> {/* Rounded box with padding and shadow */}
-                    <div className="grid grid-cols-1 sm:grid-cols-4 mg:grid-cols-4 lg:grid-cols-8 place-items-center gap-8"> {/* Grid layout */}
+                    <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 place-items-center gap-8"> {/* Grid layout */}
                         {CharactersData.map((data) => (
                             <div
                             data-aos="fade-up" // AOS animation
