@@ -72,7 +72,7 @@ const Navbar = () => {
         <div className="container flex justify-between items-center">
           {/* Logo and title */}
           <a href="#" className="font-bold text-2xl sm:text-3xl flex gap-2">
-            <img src={Logo} alt="Logo" className="w-10 uppercase highlight-logo"/> {/* Logo image */}
+            <img src={Logo} alt="Logo" className="w-10 uppercase highlight-logo" /> {/* Logo image */}
             Blackshore Archive {/* Website title */}
           </a>
           {/* Search bar */}
@@ -82,7 +82,7 @@ const Navbar = () => {
               placeholder="Search" // Placeholder text
               className="w-[200px] group-hover:w-[300px] transition-all duration-300 rounded-full border border-blue-300 px-2 py-1 focus:outline-none focus:border-primary pr-10" // Input styling
             />
-            <IoSearchOutline className="text-white group-hover:text-primary absolute top-1/2 -translate-y-1/2 right-3"/> {/* Search icon */}
+            <IoSearchOutline className="text-white group-hover:text-primary absolute top-1/2 -translate-y-1/2 right-3" /> {/* Search icon */}
           </div>
         </div>
       </div>
@@ -93,10 +93,10 @@ const Navbar = () => {
             <li key={index} className="relative group">
               <a
                 href={data.link} // Menu item link
-                className="inline-block py-2 px-4 hover:bg-blue-800 duration-200 rounded-md focus:outline-none" // Menu item styling
+                className="flex items-center gap-2 py-2 px-4 hover:bg-blue-800 duration-200 rounded-md focus:outline-none" // Menu item styling
               >
                 {data.name} {/* Menu item name */}
-                {data.subMenu && <FaCaretDown className="transition-all duration-200 group-hover:rotate-180"/>} {/* Caret down icon if submenu exists */}
+                {data.subMenu && <FaCaretDown className="transition-all duration-200 group-hover:rotate-180" />} {/* Caret down icon if submenu exists */}
               </a>
               {data.subMenu && (
                 <ul className="absolute left-0 top-full bg-white dark:bg-gray-900 shadow-md rounded-md hidden group-hover:block">
