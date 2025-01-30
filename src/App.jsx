@@ -3,6 +3,7 @@ import Navbar from './Components/Navbar/navbar.jsx' // Import Navbar component
 import Characters from './Components/Characters/Characters.jsx' // Import Characters component
 import AOS from 'aos' // Import AOS library
 import 'aos/dist/aos.css' // Import AOS CSS
+import Footer from './Components/footer/footer.jsx' // Import Footer component
 
 function App() {
   // Initialize AOS (Animate On Scroll) library for scroll animations
@@ -17,9 +18,10 @@ function App() {
   }, [])
 
   return (
-    <div>
+    <div className='bg-white dark:bg-gray-800 dark:text-white duration-200'> {/* Set background color */}
       <Navbar /> {/* Render Navbar component */}
       <Characters /> {/* Render Characters component */}
+      <Footer className='bg-gray-200' /> {/* Set fixed background color for Footer */}
     </div>
   )
 }
