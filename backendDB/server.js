@@ -13,8 +13,8 @@ app.use(express.json());
 
 // Database configuration using Windows Authentication
 const config = {
-    server: process.env.DB_SERVER,
-    database: process.env.DB_NAME,
+    server: process.env.MUDDY,
+    database: process.env.WebDB,
     options: {
         encrypt: true,
         trustServerCertificate: true, // for local development

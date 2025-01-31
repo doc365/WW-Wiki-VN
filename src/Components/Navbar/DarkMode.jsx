@@ -23,19 +23,23 @@ const DarkMode = () => {
     }
 
     return (
-        <div className="relative">
-            <img 
-                src={lightButton}
-                alt="Light Mode"
-                onClick={toggleTheme}
-                className={`w-12 cursor-pointer drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all duration-300 absolute right-0 z-10 ${theme === "dark" ? "opacity-0" : "opacity-100"}`}
-            />
-            <img 
-                src={darButton}
-                alt="Dark Mode"
-                onClick={toggleTheme}
-                className={`w-12 cursor-pointer drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all duration-300 ${theme === "dark" ? "opacity-100" : "opacity-0"}`}
-            />
+        <div className="flex items-center">
+            <div className="relative">
+                <img 
+                    src={lightButton}
+                    alt="Light Mode"
+                    onClick={toggleTheme}
+                    className={`w-12 cursor-pointer drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all duration-300 absolute right-0 z-10 ${theme === "dark" ? "opacity-0" : "opacity-100"}`}
+                />
+                <img 
+                    src={darButton}
+                    alt="Dark Mode"
+                    onClick={toggleTheme}
+                    className={`w-12 cursor-pointer drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all duration-300 ${theme === "dark" ? "opacity-100" : "opacity-0"}`}
+                />
+            </div>
+            {/* Add the search bar component here */}
+            {/* <SearchBar /> */}
         </div>
     )
 }
