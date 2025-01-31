@@ -8,13 +8,13 @@ import Footer from './Components/footer/footer.jsx' // Import Footer component
 function App() {
   // Initialize AOS (Animate On Scroll) library for scroll animations
   React.useEffect(() => {
-    AOS.init({
+    AOS.init({ 
       offset: 100, // Offset (in pixels) from the original trigger point
       duration: 1000, // Duration of animation (in milliseconds)
       easing: 'ease-in-sine', // Easing function for animation
       delay: 100, // Delay (in milliseconds) before animation starts
-    })
-    AOS.refresh() // Refresh AOS to detect new elements
+     })
+     AOS.refresh() // Refresh AOS to detect new elements
   }, [])
 
   return (
