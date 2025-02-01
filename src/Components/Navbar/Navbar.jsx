@@ -1,4 +1,5 @@
-import React from 'react'; // Import React library
+// Không cần thiết import React.
+
 import Logo from '../../assets/website/logo.png'; // Import logo image
 import { IoSearchOutline } from "react-icons/io5"; // Import search icon from react-icons
 import { FaCaretDown } from "react-icons/fa"; // Import caret down icon from react-icons
@@ -7,15 +8,15 @@ import { FaCaretDown } from "react-icons/fa"; // Import caret down icon from rea
 const Menu = [
   {
     name: "Home", // Menu item name
-    link: "#" // Menu item link
+    link: "/" // Menu item link
   },
   {
     name: "Characters", // Menu item name
-    link: "", // Menu item link
+    link: "/charactersList", // Menu item link
   },
   {
     name: "Weapons", // Menu item name
-    link: "#", // Menu item link
+    link: "/weaponsList", // Menu item link
   },
   {
     name: "Should?", // Menu item name
@@ -31,28 +32,28 @@ const Menu = [
   },
   {
     name: "Echo", // Menu item name
-    link: "#" // Menu item link
+    link: "/echoesList" // Menu item link
   }
 ];
 
-// Dropdown links for additional options
-const DropdownLinks = [
-  {
-    id: 1, // Unique identifier for the dropdown link
-    name: "About", // Dropdown link name
-    link: "#" // Dropdown link URL
-  },
-  {
-    id: 2, // Unique identifier for the dropdown link
-    name: "Contact", // Dropdown link name
-    link: "#" // Dropdown link URL
-  },
-  {
-    id: 3, // Unique identifier for the dropdown link
-    name: "FAQ", // Dropdown link name
-    link: "#" // Dropdown link URL
-  },
-];
+// // Dropdown links for additional options
+// const DropdownLinks = [
+//   {
+//     id: 1, // Unique identifier for the dropdown link
+//     name: "About", // Dropdown link name
+//     link: "#" // Dropdown link URL
+//   },
+//   {
+//     id: 2, // Unique identifier for the dropdown link
+//     name: "Contact", // Dropdown link name
+//     link: "#" // Dropdown link URL
+//   },
+//   {
+//     id: 3, // Unique identifier for the dropdown link
+//     name: "FAQ", // Dropdown link name
+//     link: "#" // Dropdown link URL
+//   },
+// ];
 
 const Navbar = () => {
   return (
