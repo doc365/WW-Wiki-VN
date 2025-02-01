@@ -11,21 +11,11 @@ const Menu = [
   },
   {
     name: "Characters", // Menu item name
-    link: "#", // Menu item link
-    subMenu: [ // Submenu items
-      { name: "Character 1", link: "#" },
-      { name: "Character 2", link: "#" },
-      { name: "Character 3", link: "#" }
-    ]
+    link: "", // Menu item link
   },
   {
     name: "Weapons", // Menu item name
     link: "#", // Menu item link
-    subMenu: [ // Submenu items
-      { name: "Weapon 1", link: "#" },
-      { name: "Weapon 2", link: "#" },
-      { name: "Weapon 3", link: "#" }
-    ]
   },
   {
     name: "Should?", // Menu item name

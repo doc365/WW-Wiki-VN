@@ -1,6 +1,6 @@
 import React from 'react' // Import React library
 import Navbar from './Components/Navbar/navbar.jsx' // Import Navbar component
-import Characters from './Components/Characters/Characters.jsx' // Import Characters component
+import Characters from './Components/Characters/CharactersList.jsx' // Import Characters component
 import AOS from 'aos' // Import AOS library
 import 'aos/dist/aos.css' // Import AOS CSS
 import Footer from './Components/footer/footer.jsx' // Import Footer component
@@ -20,7 +20,7 @@ function App() {
   return (
     <><div className='bg-white dark:bg-gray-700 dark:text-white duration-200'> {/* Set background color */}
       <Navbar /> {/* Render Navbar component */}
-      <Characters /> {/* Render Characters component */}
+      <Characters/> {/* Render Characters component */}
 
     </div><div>
         <Footer className='bg-gray-200' /> {/* Set fixed background color for Footer */}
