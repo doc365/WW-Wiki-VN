@@ -1,5 +1,5 @@
 import React from 'react'; // Import React library
-import Logo from '../../assets/logo.png'; // Import logo image
+import Logo from '../../assets/website/logo.png'; // Import logo image
 import { IoSearchOutline } from "react-icons/io5"; // Import search icon from react-icons
 import { FaCaretDown } from "react-icons/fa"; // Import caret down icon from react-icons
 
