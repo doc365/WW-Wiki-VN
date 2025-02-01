@@ -1,16 +1,16 @@
 // Không cần thiết import React.
 import { FaStar } from "react-icons/fa" // Import star icon from react-icons
 import 'aos/dist/aos.css' // Import AOS CSS
-import CharactersData from './CharactersData'; // Import CharactersData
+import CharactersData from '../Characters/CharactersData'; // Import CharactersData
 
-// Characters component
-const Characters = () => {
+// WeaponsList component
+const WeaponsList = () => {
     return (
         <div className="mt-14 pb-20"> {/* Margin top and bottom */}
             <div className="container mx-auto"> {/* Center container */}
                 <div className="text-center mb-10 max-w-[600px] mx-auto"> {/* Center text and set max width */}
-                    <p data-aos='fade-up' className="text-sm justify-center">Newest Characters</p> {/* Subtitle */}
-                    <h1 data-aos='fade-up' className="text-3xl font-bold">Characters</h1> {/* Title */}
+                    <p data-aos='fade-up' className="text-sm justify-center">Newest Weapons</p> {/* Subtitle */}
+                    <h1 data-aos='fade-up' className="text-3xl font-bold">Weapons</h1> {/* Title */}
                 </div>
                 <div className="flex justify-center"> {/* Center content */}
                     <div className="    bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"> {/* Rounded box with padding and shadow */}
@@ -42,4 +42,4 @@ const Characters = () => {
     )
 }
 
-export default Characters // Export Characters component
+export default WeaponsList // Export WeaponsList component

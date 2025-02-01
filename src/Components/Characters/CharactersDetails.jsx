@@ -1,4 +1,4 @@
-import React from 'react'
+// Không cần thiết import React.
 import { useParams } from 'react-router-dom'; // Import useParams from react-router-dom
 import CharactersData from './CharactersData'; // Import CharactersData
 

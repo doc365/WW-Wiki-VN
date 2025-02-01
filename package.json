@@ -1,39 +1,24 @@
-{
-  "name": "test",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@tailwindcss/vite": "^4.0.1",
-    "aos": "^2.3.4",
-    "axios": "^1.7.9",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "msnodesqlv8": "^4.4.0",
-    "mssql": "^11.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-icons": "^5.4.0",
-    "react-router-dom": "^7.1.5",
-    "tailwindcss": "^4.0.2"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
-    "globals": "^15.14.0",
-    "vite": "^6.0.5"
-  }
-}
+      const specifierData = { loc: specifier.loc };
+
+                    if (specifier.type === "ImportDefaultSpecifier") {
+                        name = "default";
+                    } else if (specifier.type === "ImportNamespaceSpecifier") {
+                        name = "*";
+                    } else if (specifier.imported) {
+                        name = astUtils.getModuleExportName(specifier.imported);
+                    } else if (specifier.local) {
+                        name = astUtils.getModuleExportName(specifier.local);
+                    }
+
+                    if (typeof name === "string") {
+                        if (importNames.has(name)) {
+                            importNames.get(name).push(specifierData);
+                        } else {
+                            importNames.set(name, [specifierData]);
+                        }
+                    }
+                }
+            }
+
+            checkRestrictedPathAndReport(importSource, importNames, node);
+            
