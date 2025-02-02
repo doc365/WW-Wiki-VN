@@ -3,7 +3,7 @@
 import Logo from '../../assets/website/logo.png'; // Import logo image
 import { IoSearchOutline } from "react-icons/io5"; // Import search icon from react-icons
 import { FaCaretDown } from "react-icons/fa"; // Import caret down icon from react-icons
-
+import Darkmode from './DarkMode.jsx'; // Corrected import path for DarkMode.jsx
 // Menu items with optional submenus
 const Menu = [
   {
@@ -57,7 +57,7 @@ const Menu = [
 
 const Navbar = () => {
   return (
-    <div className="shadow-md bg-white dark:bg-gray-900 dark:text-white duration-200 relative z-40">
+    <div className="navbar shadow-md bg-white dark:bg-gray-900 dark:text-white duration-200 relative z-40">
       {/* Upper navbar */}
       <div className="bg-blue-800 text-white py-2">
         <div className="container flex justify-between items-center">
@@ -74,7 +74,9 @@ const Navbar = () => {
               className="w-[200px] group-hover:w-[300px] transition-all duration-300 rounded-full border border-blue-300 px-2 py-1 focus:outline-none focus:border-primary pr-10" // Input styling
             />
             <IoSearchOutline className="text-white group-hover:text-primary absolute top-1/2 -translate-y-1/2 right-3" /> {/* Search icon */}
+            
           </div>
+          <div><Darkmode/></div>
         </div>
       </div>
       {/* Lower navbar */}

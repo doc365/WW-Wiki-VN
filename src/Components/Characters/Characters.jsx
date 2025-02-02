@@ -1,24 +1,6 @@
-// Không cần thiết import React.
-import Jiyan from '../../assets/characters/jiyan.png' // Import Jiyan image
-import Brant from '../../assets/characters/brant.png' // Import Brant image
-import Carlotta from '../../assets/characters/carlotta.png' // Import Carlotta image
-import Yinlin from '../../assets/characters/yinlin.png' // Import Yinlin image
-import SK from '../../assets/characters/sk.png' // Import Shorekeeper image
-import Camellya from '../../assets/characters/camellya.png' // Import Camellya image
-import Yohu from '../../assets/characters/Youhu.png' // Import Yohu image
+
 import { FaStar } from "react-icons/fa" // Import star icon from react-icons
 import 'aos/dist/aos.css' // Import AOS CSS
-
-// Character data array
-const CharactersData = [
-    { id: 1, name: "Jiyan", image: Jiyan, atribute: "Aero", rarity: 5, weapon: "Broadblade" }, // Jiyan character data
-    { id: 2, name: "Brant", image: Brant, atribute: "Fusion", rarity: 5, weapon: "Sword" }, // Brant character data
-    { id: 3, name: "Carlotta", image: Carlotta, atribute: "Glacio", rarity: 5, weapon: "Duo gun" }, // Carlotta character data
-    { id: 4, name: "Yinlin", image: Yinlin, atribute: "Electro", rarity: 5, weapon: "Rectifier" }, // Yinlin character data
-    { id: 5, name: "Shorekeeper", image: SK, atribute: "Spectro", rarity: 5, weapon: "Sword" }, // Shorekeeper character data
-    { id: 6, name: "Camellya", image: Camellya, atribute: "Havoc", rarity: 5, weapon: "Sword" }, // Camellya character data
-    { id: 7, name: "Yohu", image: Yohu, atribute: "Glacio", rarity: 4, weapon: "gauntlet" }, // Yohu character data
-]
 
 // Characters component
 const Characters = () => {

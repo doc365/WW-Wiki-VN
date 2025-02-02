@@ -1,47 +1,75 @@
-import React from 'react'
-import lightButton from '../../assets/website/lightmode.png'
-import darButton from '../../assets/website/darkmode.png'
+import { useState, useEffect } from 'react';
 
-const DarkMode = () => {
-    const [theme, setTheme] = React.useState(
-        localStorage.getItem("theme") || "light"
-    )
-    const element = document.documentElement // html tag
+const ThemeToggle = () => {
+  const [isDark, setIsDark] = useState(false);
 
-    React.useEffect(() => {
-        if (theme === "dark") {
-            element.classList.add("dark")
-            localStorage.setItem("theme", "dark")
-        } else {
-            element.classList.remove("dark")
-            localStorage.setItem("theme", "light")
-        }
-    }, [theme])
-
-    const toggleTheme = () => {
-        setTheme(theme === "light" ? "dark" : "light")
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.querySelector('.navbar').classList.add('dark:bg-gray-800');
+      document.querySelector('.app').classList.add('dark:bg-gray-700');
+      document.querySelector('.app').classList.add('dark:text-white');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.querySelector('.navbar').classList.remove('dark:bg-gray-800');
+      document.querySelector('.app').classList.remove('dark:bg-gray-700');
+      document.querySelector('.app').classList.remove('dark:text-white');
+      document.querySelector('.app').classList.add('text-black');
     }
+  }, [isDark]);
 
-    return (
-        <div className="flex items-center">
-            <div className="relative">
-                <img
-                    src={lightButton}
-                    alt="Light Mode"
-                    onClick={toggleTheme}
-                    className={`w-12 cursor-pointer drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all duration-300 absolute right-0 z-10 ${theme === "dark" ? "opacity-0" : "opacity-100"}`}
+  return (
+    <label className="flex items-center">
+      <div className="relative mx-3">
+        <input
+          type="checkbox"
+          className="sr-only peer"
+          checked={isDark}
+          onChange={(e) => setIsDark(e.target.checked)}
+          role="switch"
+        />
+        
+        {/* Toggle background */}
+        <div className="relative w-24 h-12 rounded-[25%/50%] bg-[hsl(48,90%,85%)] 
+                      dark:bg-[hsl(198,90%,15%)] p-1
+                      ring-1 ring-blue-200 transition-colors duration-300
+                      peer-focus:ring-2 peer-focus:ring-blue-400">
+          
+          {/* Toggle circle */}
+          <div className={`absolute w-10 h-10 rounded-full 
+                          bg-[hsl(48,90%,55%)] dark:bg-[hsl(198,90%,55%)]
+                          transition-transform duration-300
+                          ${isDark ? 'translate-x-12' : 'translate-x-0'}`}>
+            
+            {/* Sun/Moon Icon Container */}
+            <div className="absolute top-2 left-2 w-6 h-6">
+              {/* Main circle (sun/moon) */}
+              <div className={`absolute w-full h-full rounded-full 
+                              transition-all duration-300
+                              ${isDark 
+                                ? 'scale-100 shadow-[inset_0.2em_-0.2em_0_0.2em_#fff]' 
+                                : 'scale-50 shadow-[inset_0.4em_-0.4em_0_0.5em_#fff]'}`} />
+              
+              {/* Sun rays */}
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`absolute w-1 h-2 bg-white
+                             transition-all duration-300
+                             ${isDark ? 'opacity-0 translate-y-3' : 'opacity-100'}
+                             top-1/2 left-1/2 -ml-0.5
+                             origin-[50%_0]`}
+                  style={{
+                    transform: `rotate(${i * 45}deg) translateY(0.45em)${isDark ? ' translateY(0.8em)' : ''}`
+                  }}
                 />
-                <img
-                    src={darButton}
-                    alt="Dark Mode"
-                    onClick={toggleTheme}
-                    className={`w-12 cursor-pointer drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all duration-300 ${theme === "dark" ? "opacity-100" : "opacity-0"}`}
-                />
+              ))}
             </div>
-            {/* Add the search bar component here */}
-            {/* <SearchBar /> */}
+          </div>
         </div>
-    )
-}
+      </div>
+    </label>
+  );
+};
 
-export default DarkMode
+export default ThemeToggle;
