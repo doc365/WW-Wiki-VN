@@ -45,7 +45,7 @@ async function executeQuery(query, params = []) {
 // Endpoint to fetch characters data
 app.get('/api', async (req, res) => {
   try {
-    const result = await executeQuery('SELECT Char_id, Name, Description FROM Characters');
+    const result = await executeQuery('SELECT * FROM Characters');
     res.json({ characters: result.recordset }); // Return characters data
   } catch (err) {
     console.error(err);

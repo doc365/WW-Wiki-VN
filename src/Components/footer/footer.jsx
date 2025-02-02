@@ -13,6 +13,7 @@ const BannerImg = {
     height: '100%',
     width: '100%',
     position: 'absolute',
+
     top: '0',
     left: '0',
     filter: 'blur(4px)', // Added blur effect
