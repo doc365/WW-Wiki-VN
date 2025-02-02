@@ -6,7 +6,6 @@ import CharactersData from './CharactersData'; // Import CharactersData
 // Characters component
 const Characters = () => {
     // Sắp xếp lại danh sách nhân vật theo Rarity.
-    const sortedCharacters = [...CharactersData].sort((a, b) => b.rarity - a.rarity || a.name.localeCompare(b.name));
     return (
         <div className="mt-14 pb-20"> {/* Margin top and bottom */}
             <div className="container mx-auto"> {/* Center container */}
@@ -17,7 +16,7 @@ const Characters = () => {
                 <div className="flex justify-center"> {/* Center content */}
                     <div className="    bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"> {/* Rounded box with padding and shadow */}
                         <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-8 place-items-center gap-8"> {/* Grid layout */}
-                            {sortedCharacters.map((data) => (
+                            {CharactersData.map((data) => (
                                 <div
                                     data-aos="fade-up" // AOS animation
                                     data-aos-delay={data.aosDelay} // AOS animation delay
