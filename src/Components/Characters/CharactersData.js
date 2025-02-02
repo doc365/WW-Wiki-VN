@@ -28,7 +28,7 @@ import Phoebe from '../../assets/Characters/27.png'
 import Brant from '../../assets/Characters/28.png'
 
 const CharactersData = [
-    { id: 1, name: "Yangyang", image: Yangyang, attribute: "Aero", rarity: 4, weapon_type: "Sword" },
+ { id: 1, name: "Yangyang", image: Yangyang, attribute: "Aero", rarity: 4, weapon_type: "Sword" },
     { id: 2, name: "Chixia", image: Chixia, attribute: "Fusion", rarity: 4, weapon_type: "Pistols" },
     { id: 3, name: "Baizhi", image: Baizhi, attribute: "Glacio", rarity: 4, weapon_type: "Rectifier" },
     { id: 4, name: "Sanhua", image: Sanhua, attribute: "Glacio", rarity: 4, weapon_type: "Sword" },

@@ -30,15 +30,15 @@ function App() {
 
   return (
     <Router>
+
+      <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'> {/* Set background color */}
+        <Navbar /> {/* Navbar cho phép điều hướng giữa các Components */}
+
+        {/* Các Routes cho các component */}
+
       <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'>
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Characters />} />
-          <Route path="/charactersList" element={<Characters />} />
-          <Route path="/weaponsList" element={<WeaponsList />} />
-          <Route path="/echoesList" element={<EchoesList />} />
-        </Routes>
-        <Footer className='bg-gray-200' />
+
       </div>
     </Router>
   );

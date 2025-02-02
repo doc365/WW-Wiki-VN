@@ -8,14 +8,15 @@ import { FaLocationArrow } from "react-icons/fa";
 const BannerImg = {
     backgroundImage: `url(${Banner})`,
     backgroundSize: 'cover',
-    backgroundPosition: 'bottom', // Corrected typo
+    backgroundPosition: 'center calc(100% + 500px)', // Corrected typo
     backgroundRepeat: 'no-repeat',
     height: '100%',
     width: '100%',
     position: 'absolute',
-    top: 0,
-    left: 0,
-    filter: 'blur(1px)', // Added blur effect
+
+    top: '0',
+    left: '0',
+    filter: 'blur(4px)', // Added blur effect
 }
 
 const footerlinks = [
