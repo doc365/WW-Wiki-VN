@@ -16,7 +16,6 @@ const BannerImg = {
     top: 0,
     left: 0,
     filter: 'blur(1px)', // Added blur effect
-    zIndex: -1
 }
 
 const footerlinks = [
