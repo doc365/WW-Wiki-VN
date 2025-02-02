@@ -6,7 +6,7 @@ import 'aos/dist/aos.css';
 import Characters from './Components/Characters/CharactersList.jsx';
 import WeaponsList from './Components/Weapon/weaponsList.jsx';
 import EchoesList from './Components/Echo/EchoesList.jsx';
-import Navbar from './Components/Navbar/navbar.jsx';
+import Navbar from './Components/Navbar/Navbar.jsx';
 import Footer from './Components/footer/footer.jsx';
 
 function App() {
@@ -30,15 +30,17 @@ function App() {
 
   return (
     <Router>
-
       <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'> {/* Set background color */}
         <Navbar /> {/* Navbar cho phép điều hướng giữa các Components */}
-
+        <Characters/>
         {/* Các Routes cho các component */}
+        <Routes>
+          <Route path="/characters" element={<Characters />} />
+          <Route path="/weapons" element={<WeaponsList />} />
+          <Route path="/echoes" element={<EchoesList />} />
+        </Routes>
 
-      <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'>
-        <Navbar />
-
+        <Footer /> {/* Footer component */}
       </div>
     </Router>
   );

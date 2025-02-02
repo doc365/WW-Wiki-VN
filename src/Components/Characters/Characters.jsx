@@ -1,6 +1,6 @@
-
-import { FaStar } from "react-icons/fa" // Import star icon from react-icons
-import 'aos/dist/aos.css' // Import AOS CSS
+import { FaStar } from "react-icons/fa"; // Import star icon from react-icons
+import 'aos/dist/aos.css'; // Import AOS CSS
+import CharactersData from './CharactersData'; // Import CharactersData
 
 // Characters component
 const Characters = () => {
@@ -12,7 +12,7 @@ const Characters = () => {
                     <h1 data-aos='fade-up' className="text-3xl font-bold">Characters</h1> {/* Title */}
                 </div>
                 <div className="flex justify-center"> {/* Center content */}
-                    <div className="    bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"> {/* Rounded box with padding and shadow */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"> {/* Rounded box with padding and shadow */}
                         <div className="grid grid-cols-1 sm:grid-cols-4 mg:grid-cols-4 lg:grid-cols-8 place-items-center gap-8"> {/* Grid layout */}
                             {CharactersData.map((data) => (
                                 <div
@@ -23,7 +23,7 @@ const Characters = () => {
                                     <div className={`relative h-[85px] w-[120px] object-cover rounded-md overflow-hidden ${data.rarity === 5 ? 'bg-yellow-300' : data.rarity === 4 ? 'bg-purple-500' : ''} ${data.name.toLowerCase()}`}> {/* Image container with conditional background and character name */}
                                         <img src={data.image} alt="" className="h-full w-full object-cover rounded-md group-hover:blur-sm transition-all duration-300" /> {/* Character image with blur effect on hover */}
                                         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 transform translate-y-full group-hover:translate-y-0 transition-all duration-300"> {/* Information tag */}
-                                            {data.atribute} - {data.weapon} {/* Character attribute and weapon */}
+                                            {data.attribute} - {data.weapon} {/* Character attribute and weapon */}
                                             <div className='flex justify-center items-center gap-1'> {/* Star rating */}
                                                 <FaStar className='text-white' /> {/* Star icon */}
                                                 <span>{data.rarity}</span> {/* Rarity value */}
@@ -38,7 +38,7 @@ const Characters = () => {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default Characters // Export Characters component
+export default Characters; // Export Characters component
