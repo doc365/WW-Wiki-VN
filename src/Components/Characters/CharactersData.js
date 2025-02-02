@@ -32,7 +32,7 @@ const CharactersData = [
     { id: 2, name: "Chixia", image: Chixia, atribute: "Fusion", rarity: 4, weapon_type: "Pistols" },
     { id: 3, name: "Baizhi", image: Baizhi, atribute: "Glacio", rarity: 4, weapon_type: "Rectifier" },
     { id: 4, name: "Sanhua", image: Sanhua, atribute: "Glacio", rarity: 4, weapon_type: "Sword" },
-    { id: 5, name: "Aalto", image: Aalto, atribute: "Pyro", rarity: 5, weapon_type: "Pistols" },
+    { id: 5, name: "Aalto", image: Aalto, atribute: "Pyro", rarity: 4, weapon_type: "Pistols" },
     { id: 6, name: "Encore", image: Encore, atribute: "Electro", rarity: 5, weapon_type: "Rectifier" },
     { id: 7, name: "Jiaxin", image: Jiaxin, atribute: "Aero", rarity: 5, weapon_type: "guantlet" },
     { id: 8, name: "Jiyan", image: Jiyan, atribute: "Fusion", rarity: 5, weapon_type: "Broadblade" },
@@ -54,7 +54,7 @@ const CharactersData = [
     { id: 24, name: "Camellya", image: Camellya, atribute: "Glacio", rarity: 5, weapon_type: "Sword" },
     { id: 25, name: "Carlotta", image: Carlotta, atribute: "Pyro", rarity: 5, weapon_type: "Pistols" },
     { id: 26, name: "Roccia", image: Roccia, atribute: "Electro", rarity: 5, weapon_type: "guantlet" },
-    { id: 27, name: "Phoebe", image: Phoebe, atribute: "Aero", rarity: 4, weapon_type: "Rectifier" },
+    { id: 27, name: "Phoebe", image: Phoebe, atribute: "Aero", rarity: 5, weapon_type: "Rectifier" },
     { id: 28, name: "Brant", image: Brant, atribute: "Fusion", rarity: 5, weapon_type: "Sword" },
 ]
 

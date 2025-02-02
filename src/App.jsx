@@ -1,6 +1,5 @@
 import { useEffect } from 'react'; // Không cần thiết import React.
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Darkmode from './Components/Navbar/DarkMode.jsx'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 // import axios from 'axios';
@@ -43,7 +42,7 @@ function App() {
     <Router>
       <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'> {/* Set background color */}
         <Navbar /> {/* Navbar cho phép điều hướng giữa các Components */}
-        
+
         {/* Các Routes cho các component */}
         <Routes>
           <Route path="/" element={<Characters />} /> {/* Trang mặc định */}

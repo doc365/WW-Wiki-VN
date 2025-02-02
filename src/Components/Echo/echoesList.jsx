@@ -21,7 +21,7 @@ const EchoesList = () => {
                                     data-aos-delay={data.aosDelay} // AOS animation delay
                                     key={data.id} // Unique identifier
                                     className='relative group space-y-2 text-center'> {/* Card container */}
-                                    <div className={`relative h-[85px] w-[120px] object-cover rounded-md overflow-hidden ${data.rarity === 5 ? 'bg-yellow-300' : data.rarity === 4 ? 'bg-purple-500' : ''} ${data.name.toLowerCase()}`}> {/* Image container with conditional background and character name */}
+                                    <div className={`relative h-[120px] w-[120px] object-cover rounded-md overflow-hidden ${data.rarity === 5 ? 'bg-yellow-300' : data.rarity === 4 ? 'bg-purple-500' : ''} ${data.name.toLowerCase()}`}> {/* Image container with conditional background and character name */}
                                         <img src={data.image} alt="" className="h-full w-full object-cover rounded-md group-hover:blur-sm transition-all duration-300" /> {/* Character image with blur effect on hover */}
                                         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 transform translate-y-full group-hover:translate-y-0 transition-all duration-300"> {/* Information tag */}
                                             {data.atribute} - {data.weapon} {/* Character attribute and weapon */}
