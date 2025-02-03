@@ -12,11 +12,11 @@ const Menu = [
   },
   {
     name: "Characters", // Menu item name
-    link: "/charactersList", // Menu item link
+    link: "/characters" // Menu item link
   },
   {
     name: "Weapons", // Menu item name
-    link: "/weaponsList", // Menu item link
+    link: "/weapons" // Menu item link
   },
   {
     name: "Should?", // Menu item name
@@ -32,7 +32,7 @@ const Menu = [
   },
   {
     name: "Echo", // Menu item name
-    link: "/echoesList" // Menu item link
+    link: "/echoes" // Menu item link
   }
 ];
 

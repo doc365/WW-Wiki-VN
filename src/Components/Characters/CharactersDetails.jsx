@@ -14,7 +14,7 @@ function CharactersDetails() {
         <div>
             <h1>{character.name}</h1>
             <img src={character.image} alt={character.name} />
-            <p>Attribute: {character.atribute}</p>
+            <p>Attribute: {character.attribute}</p>
             <p>Rarity: {character.rarity}</p>
             <p>Weapon: {character.weapon}</p>
         </div>
