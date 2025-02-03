@@ -1,24 +1,25 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:5000/api';
-axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+axios.defaults.baseURL = 'http://localhost:5000';
 
-const fetchData = async () => {
+const fetchAllCharacters = async () => {
   try {
-    const response = await axios.get('/data');
-    console.log(response.data);
+    const response = await axios.get('/api/characters');
+    return response.data;  // This will be the array of characters
   } catch (error) {
     console.error('Error:', error);
+    throw error;
   }
 };
 
-const postData = async (data) => {
+const fetchCharacterById = async (id) => {
   try {
-    const response = await axios.post('/data', data);
-    console.log(response.data);
+    const response = await axios.get(`/api/characters/${id}`);
+    return response.data;  // This will be a single character
   } catch (error) {
     console.error('Error:', error);
+    throw error;
   }
 };
 
-export { fetchData, postData };
+export { fetchAllCharacters, fetchCharacterById };

@@ -1,23 +1,40 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { fetchData } from '../../Components/axios.js';
+import { fetchCharacterById } from '../../Components/axios.js';
 
 const CharacterDetail = () => {
   const { id } = useParams();
   const [character, setCharacter] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const getCharacter = async () => {
-      const data = await fetchData();
-      const foundCharacter = data.find((char) => char.id === parseInt(id));
-      setCharacter(foundCharacter);
+      try {
+        setLoading(true);
+        const data = await fetchCharacterById(id);
+        setCharacter(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
     getCharacter();
   }, [id]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   if (!character) {
     return <div>Character not found</div>;
   }
+
   return (
     <div className="container mx-auto mt-14 mb-12">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -32,11 +49,9 @@ const CharacterDetail = () => {
           <p>Attribute: {character.attribute}</p>
           <p>Weapon Type: {character.weapon_type}</p>
           <p>Rarity: {character.rarity}</p>
-          {/* Add more character details as needed */}
         </div>
         <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow-md md:col-span-2">
           <h2 className="text-xl font-semibold mb-2">Additional Info</h2>
-          {/* Add additional character information here */}
         </div>
       </div>
     </div>
