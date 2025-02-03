@@ -83,7 +83,7 @@ app.get('/api/characters/:id', async (req, res) => {
         
         res.json(result.recordset[0]);
     } catch (err) {
-        console.error(err);
+        console.error('Error fetching character by ID:', err);
         res.status(500).json({ error: err.message });
     }
 });

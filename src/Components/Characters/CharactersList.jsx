@@ -9,8 +9,13 @@ const Characters = () => {
 
     useEffect(() => {
         // Fetch character data from API
-        fetch('https://api.example.com/characters')
-            .then(response => response.json())
+        fetch('http://localhost:5000/api/characters')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => setCharactersData(data))
             .catch(error => console.error('Error fetching character data:', error));
     }, []); // Empty dependency array to run only once
