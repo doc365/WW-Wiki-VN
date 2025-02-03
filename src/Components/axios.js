@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+
 const fetchData = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/data');
+    const response = await axios.get('/data');
     console.log(response.data);
   } catch (error) {
     console.error('Error:', error);
@@ -11,7 +14,7 @@ const fetchData = async () => {
 
 const postData = async (data) => {
   try {
-    const response = await axios.post('http://localhost:5000/api/data', data);
+    const response = await axios.post('/data', data);
     console.log(response.data);
   } catch (error) {
     console.error('Error:', error);
