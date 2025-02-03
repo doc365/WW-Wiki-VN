@@ -5,9 +5,8 @@ require('dotenv').config();
 
 const app = express();
 
-// Corrected CORS configuration
 app.use(cors({
-    origin: 'http://localhost:5173', // Removed trailing slash
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],
     credentials: true
@@ -15,7 +14,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// Database configuration for Windows Authentication
 const config = {
     server: 'MUDDY',
     database: 'WebDB',
@@ -38,7 +36,6 @@ pool.connect(err => {
     }
 });
 
-// Generic query function
 async function executeQuery(query, params = []) {
     await poolConnect;
     const request = pool.request();
@@ -50,29 +47,51 @@ async function executeQuery(query, params = []) {
     return request.query(query);
 }
 
+// Get all characters
 app.get('/api/characters', async (req, res) => {
-  try {
-      const result = await executeQuery('SELECT * FROM Characters');
-      res.json(result.recordset);  // Return just the recordset array
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: err.message });
-  }
+    try {
+        const result = await executeQuery(`
+            SELECT Char_id, Name, Attribute, Weapon_type, Rarity, SigWea, 
+                   Stat, Tag, Skill_id, Description, Image 
+            FROM Characters
+        `);
+        res.json(result.recordset);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
+// Get character by ID
 app.get('/api/characters/:id', async (req, res) => {
-  try {
-      const result = await executeQuery('SELECT * FROM Characters WHERE id = @id', [
-          { name: 'id', type: sql.Int, value: parseInt(req.params.id) }
-      ]);
-      
-      if (result.recordset.length === 0) {
-          return res.status(404).json({ error: 'Character not found' });
-      }
-      
-      res.json(result.recordset[0]);  // Return the single character
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: err.message });
-  }
+    try {
+        const result = await executeQuery(`
+            SELECT Char_id, Name, Attribute, Weapon_type, Rarity, SigWea, 
+                   Stat, Tag, Skill_id, Description, Image 
+            FROM Characters 
+            WHERE Char_id = @id`,
+            [{
+                name: 'id',
+                type: sql.Int,
+                value: parseInt(req.params.id)
+            }]
+        );
+        
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ error: 'Character not found' });
+        }
+        
+        res.json(result.recordset[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
+
+// Test endpoint
+app.get('/test', (req, res) => {
+    res.json({ message: 'Server is running' });
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
