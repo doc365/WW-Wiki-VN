@@ -1,9 +1,19 @@
 import { useParams } from 'react-router-dom';
-import CharactersData from '../../Components/Characters/CharactersData.js';
+import { useEffect, useState } from 'react';
+import { fetchData } from '../../Components/axios.js';
 
 const CharacterDetail = () => {
   const { id } = useParams();
-  const character = CharactersData.find((char) => char.id === parseInt(id));
+  const [character, setCharacter] = useState(null);
+
+  useEffect(() => {
+    const getCharacter = async () => {
+      const data = await fetchData();
+      const foundCharacter = data.find((char) => char.id === parseInt(id));
+      setCharacter(foundCharacter);
+    };
+    getCharacter();
+  }, [id]);
 
   if (!character) {
     return <div>Character not found</div>;
