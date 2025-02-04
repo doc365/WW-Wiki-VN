@@ -1,0 +1,39 @@
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+.env.local
+.env.*.local
+
+# Thư mục build
+build/
+dist/
+
+# Log files
+logs/
+*.log
+*.log.*
+
+# Thư mục cache và tạm thời
+.cache/
+.tmp/
+
+# IDE & Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Coverage báo cáo
+coverage/
+
+# Thư mục sessions nếu dùng express-session
+sessions/
+
+# Các file dump database
+*.sqlite
+*.sqlite3
+*.db
+
+# Thư mục upload nếu có
+uploads/
+public/uploads/
