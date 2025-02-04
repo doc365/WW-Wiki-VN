@@ -13,7 +13,7 @@ export const fetchAllCharacters = async () => {
         throw error;
     }
 };
-
+    
 export const fetchCharacterById = async (id) => {
     try {
         const response = await api.get(`/api/characters/${id}`);
