@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { fetchCharacterById } from '../../Components/axios.js';
+import { fetchCharacterById } from '../axios';
 
 const CharacterDetail = () => {
     const { id } = useParams();
@@ -11,7 +11,6 @@ const CharacterDetail = () => {
     useEffect(() => {
         const getCharacter = async () => {
             try {
-                setLoading(true);
                 const data = await fetchCharacterById(id);
                 setCharacter(data);
             } catch (err) {
@@ -36,27 +35,13 @@ const CharacterDetail = () => {
                 {character.Image && (
                     <div>
                         <img 
-                            src={`data:image/jpeg;base64,${character.Image}`} 
+                            src={`data:image/jpeg;base64,${character.portrait}`} 
                             alt={character.Name} 
                             className="w-full h-auto rounded-md mb-4"
                         />
                     </div>
                 )}
-                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-2">Character Details</h2>
-                    <p>Attribute: {character.Attribute}</p>
-                    <p>Weapon Type: {character.Weapon_type}</p>
-                    <p>Rarity: {character.Rarity}</p>
-                    <p>Signature Weapon: {character.SigWea}</p>
-                    <p>Stat: {character.Stat}</p>
-                    <p>Tag: {character.Tag}</p>
-                </div>
-                {character.Description && (
-                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg shadow-md md:col-span-2">
-                        <h2 className="text-xl font-semibold mb-2">Description</h2>
-                        <p>{character.Description}</p>
-                    </div>
-                )}
+                {/* Add other character details here */}
             </div>
         </div>
     );

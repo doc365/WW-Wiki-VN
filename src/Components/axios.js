@@ -19,7 +19,7 @@ export const fetchCharacterById = async (id) => {
         const response = await api.get(`/api/characters/${id}`);
         return response.data;
     } catch (error) {
-        console.error('Error fetching character:', error);
+        console.error('Error fetching character by ID:', error.response ? error.response.data : error.message);
         throw error;
     }
 };
