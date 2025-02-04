@@ -26,7 +26,7 @@ import Carlotta from '../../assets/CharactersIcon/25.png'
 import Roccia from '../../assets/CharactersIcon/26.png'
 import Phoebe from '../../assets/CharactersIcon/27.png'
 import Brant from '../../assets/CharactersIcon/28.png'
-import PhoebePt from '../../assets/CharacterPortrait/Phoebe.png'
+import PhoebePt from '../../assets/CharacterPortrait/Phoebe.jpeg'
 
 const CharactersData = [
     { id: 1, name: "Yangyang", image: Yangyang, portrait: PhoebePt, attribute: "Aero", rarity: 4, weapon_type: "Sword" },

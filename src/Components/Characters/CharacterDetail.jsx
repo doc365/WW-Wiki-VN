@@ -32,8 +32,8 @@ const CharacterDetail = () => {
                 <div className="md:col-span-2">
                     <h1 className="text-3xl font-bold mb-4">{character.Name}</h1>
                 </div>
-                {character.Image && (
-                    <div>
+                {character.portrait && (
+                    <div className="flex justify-center md:justify-start md:w-1/2">
                         <img 
                             src={`data:image/jpeg;base64,${character.portrait}`} 
                             alt={character.Name} 
@@ -41,7 +41,11 @@ const CharacterDetail = () => {
                         />
                     </div>
                 )}
-                {/* Add other character details here */}
+                <div className="flex flex-col justify-center md:w-1/2">
+                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-md shadow-md">
+                        {/* Add other character details here */}
+                    </div>
+                </div>
             </div>
         </div>
     );

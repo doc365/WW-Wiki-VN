@@ -89,9 +89,10 @@ app.get('/api/characters/:id', async (req, res) => {
     }
 });
 
+
 // Test endpoint
-app.get('/test', (req, res) => { 
-    res.json({ message: 'Server is running on ' });
+app.get('/api', (req, res) => { 
+    res.json({ message: 'API is running' });
 });
 
 const PORT = process.env.PORT || 5000;

@@ -10,10 +10,9 @@ import EchoesList from './Components/Echo/EchoesList.jsx';
 import Navbar from './Components/Navbar/Navbar.jsx';
 import Footer from './Components/footer/footer.jsx';
 
-function App() {
+const App = () => {
   useEffect(() => {
     AOS.init({
-      offset: 100, // Offset (in pixels) from the original trigger point
       duration: 1000, // Duration of animation (in milliseconds)
       easing: 'ease-in-sine', // Easing function for animation
       delay: 100, // Delay (in milliseconds) before animation starts
@@ -21,28 +20,27 @@ function App() {
     AOS.refresh();
   }, []);
 
-  const [backendData, setBackendData] = useState([{}])
+  const [backendData, setBackendData] = useState([{}]);
 
   useEffect(() => {
-    fetch("/api")
+    fetch("http://localhost:5000/api")
       .then(response => response.json())
-      .then(data => setBackendData(data));
+      .then(data => setBackendData(data))
+      .catch(error => console.error('Error fetching data:', error));
   }, []); // Add empty dependency array to avoid multiple fetch calls
 
   return (
     <Router>
-      <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'> {/* Set background color */}
-        <Navbar /> {/* Navbar cho phép điều hướng giữa các Components */}
-        <Characters/>
-        {/* Các Routes cho các component */}
+      <div className='app bg-white dark:bg-gray-700 text-black dark:text-white duration-200'>
+        <Navbar />
+        <Characters />
         <Routes>
           <Route path="/characters" element={<Characters />} />
           <Route path="/characters/:id" element={<CharacterDetail />} />
           <Route path="/weapons" element={<WeaponsList />} />
           <Route path="/echoes" element={<EchoesList />} />
         </Routes>
-
-        <Footer /> {/* Footer component */}
+        <Footer />
       </div>
     </Router>
   );
