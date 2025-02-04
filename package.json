@@ -1,0 +1,15 @@
+{
+    "name": "wuwa-fandom-wiki",
+    "description": "wuwa-fandom-wiki",
+    "private": true,
+    "version": "1.0.0",
+    "workspaces": [
+        "BE",
+        "frontend"
+    ],
+    "author": "Muddy, Maiyon",
+    "license": "ISC",
+    "keywords": [
+        "wuwa-fandom-wiki"
+    ]
+}
