@@ -47,21 +47,6 @@ async function executeQuery(query, params = []) {
     return request.query(query);
 }
 
-// Get all characters
-app.get('/api/characters', async (req, res) => {
-    try {
-        const result = await executeQuery(`
-            SELECT Char_id, Name, Attribute, Weapon_type, Rarity, SigWea, 
-                   Stat, Tag, Skill_id, Description, Image 
-            FROM Characters
-        `);
-        res.json(result.recordset);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
 // Get character by ID
 app.get('/api/characters/:id', async (req, res) => {
     try {
@@ -88,10 +73,19 @@ app.get('/api/characters/:id', async (req, res) => {
     }
 });
 
-
 // Test endpoint
-app.get('/api', (req, res) => { 
-    res.json({ message: 'API is running' });
+app.get('/api', async (req, res) => {
+    try {
+        const result = await executeQuery(`
+            SELECT Id, Name, Attribute, Weapon_type, Rarity, SigWea, 
+                   Stat, Tag, Skill_id, Description 
+            FROM Characters
+        `);
+        res.json({ data: result.recordset });
+    } catch (err) {
+        console.error('Error executing test endpoint query:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
     
 const PORT = process.env.PORT || 5000;
