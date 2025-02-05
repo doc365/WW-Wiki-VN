@@ -51,10 +51,10 @@ async function executeQuery(query, params = []) {
 app.get('/api/characters/:id', async (req, res) => {
     try {
         const result = await executeQuery(`
-            SELECT Char_id, Name, Attribute, Weapon_type, Rarity, SigWea, 
-                   Stat, Tag, Skill_id, Description, Image 
+            SELECT Id, Name, Attribute, Weapon_type, Rarity, SigWea, 
+                   Stat, Tag, Skill_id, Description
             FROM Characters 
-            WHERE Char_id = @id`,
+            WHERE Id = @Id`,
             [{
                 name: 'id',
                 type: sql.Int,
