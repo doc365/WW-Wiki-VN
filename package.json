@@ -3,7 +3,6 @@
     "description": "wuwa-fandom-wiki",
     "private": true,
     "version": "1.0.0",
-    "type": "module",
     "workspaces": [
         "backend",
         "frontend"
@@ -12,5 +11,8 @@
     "license": "ISC",
     "keywords": [
         "wuwa-fandom-wiki"
-    ]
+    ],
+    "scripts": {
+        "lint": "eslint ."
+    }
 }
