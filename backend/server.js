@@ -56,7 +56,7 @@ app.get('/api/characters/:id', async (req, res) => {
             FROM Characters 
             WHERE Id = @Id`,
             [{
-                name: 'id',
+                name: 'Id',
                 type: sql.Int,
                 value: parseInt(req.params.id)
             }]

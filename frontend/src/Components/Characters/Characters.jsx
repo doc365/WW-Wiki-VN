@@ -1,6 +1,6 @@
 import { FaStar } from "react-icons/fa"; // Import star icon from react-icons
 import 'aos/dist/aos.css'; // Import AOS CSS
-import CharactersData from './CharactersData'; // Import CharactersData
+import CharactersData from './charactersData'; // Import CharactersData
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 // Characters component
