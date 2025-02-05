@@ -3,9 +3,10 @@
     "description": "wuwa-fandom-wiki",
     "private": true,
     "version": "1.0.0",
+    "type": "module",
     "workspaces": [
-        "back-end",
-        "front-end"
+        "backend",
+        "frontend"
     ],
     "author": "Muddy, Maiyon",
     "license": "ISC",

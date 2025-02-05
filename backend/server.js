@@ -63,11 +63,10 @@ app.get('/api/characters', async (req, res) => {
 });
 
 // Get character by ID
-// Get character by ID
 app.get('/api/characters/:id', async (req, res) => {
     try {
         const result = await executeQuery(`
-            SELECT Char_id, Name, Atribute, Weapon_type, Rarity, SigWea, 
+            SELECT Char_id, Name, Attribute, Weapon_type, Rarity, SigWea, 
                    Stat, Tag, Skill_id, Description, Image 
             FROM Characters 
             WHERE Char_id = @id`,
