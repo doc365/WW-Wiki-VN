@@ -12,9 +12,15 @@ const CharacterDetail = () => {
     useEffect(() => {
         const getCharacter = async () => {
             try {
-                const data = await fetchCharacterById(id);
-                const characterImage = charactersData.find(char => char.id === id)?.portrait || '';
-                setCharacter({ ...data, portrait: characterImage });
+                // Check if character exists in local data
+                const localCharacter = charactersData.find(char => char.id === parseInt(id)); // New line
+                if (localCharacter) { // New line
+                    setCharacter(localCharacter); // New line
+                } else { // New line
+                    // Fetch character from API if not found locally
+                    const data = await fetchCharacterById(id);
+                    setCharacter(data);
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -33,7 +39,7 @@ const CharacterDetail = () => {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                 <div className="md:col-span-2 flex flex-col items-start w-150">
                     <h1 className="text-3xl font-bold mb-1">{character.name}</h1>
-                    <img src={CharacterData.portrait} alt={character.name} className="w-full h-auto rounded-md mb-4" />
+                    <img src={character.portrait} alt={character.name} className="w-full h-auto rounded-md mb-4" />
                     {/* Add more character details as needed */}
                 </div>
                 <div className="bg-gray-100 dark:bg-gray-700 p-5 rounded-md shadow-md">
