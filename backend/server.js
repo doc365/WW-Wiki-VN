@@ -34,12 +34,10 @@ if (config.user && config.password) {
 const pool = new sqlClient.ConnectionPool(config);
 const poolConnect = pool.connect();
 
-pool.connect(err => {
-    if (err) {
-        console.error('Database connection failed:', err);
-    } else {
-        console.log('Successfully connected to WebDB on MUDDY server');
-    }
+poolConnect.then(() => {
+    console.log('Successfully connected to WebDB on MUDDY server');
+}).catch(err => {
+    console.error('Database connection failed:', err);
 });
 
 async function executeQuery(query, params = []) {
