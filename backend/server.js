@@ -34,12 +34,10 @@ if (config.user && config.password) {
 const pool = new sqlClient.ConnectionPool(config);
 const poolConnect = pool.connect();
 
-pool.connect(err => {
-    if (err) {
-        console.error('Database connection failed:', err);
-    } else {
-        console.log('Successfully connected to WebDB on MUDDY server');
-    }
+poolConnect.then(() => {
+    console.log('Successfully connected to WebDB on MUDDY server');
+}).catch(err => {
+    console.error('Database connection failed:', err);
 });
 
 async function executeQuery(query, params = []) {
@@ -95,4 +93,4 @@ app.get('/api', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));  
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
