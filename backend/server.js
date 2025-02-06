@@ -1,7 +1,9 @@
 const express = require('express');
-const sql = require('mssql/msnodesqlv8');
+// Sử dụng mssql (tedious driver) thường sử dụng dạng User, Password.
+const tediousSql = require('mssql');
+// Sử dụng msnodesqlv8 (msnodesqlv8 driver) thường sử dụng dạng Windows Authentication.
+const msnodesqlv8Sql = require('mssql/msnodesqlv8');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 
@@ -14,18 +16,22 @@ app.use(cors({
 
 app.use(express.json());
 
-const config = {
-    server: 'MUDDY',
-    database: 'WebDB',
-    driver: 'msnodesqlv8',
-    options: {
-        trustedConnection: true,
-        trustServerCertificate: true,
-        enableArithAbort: true,
-    },
-};
+const config = require('./config/env.js');  // Import biến config chứa các thông số của database.
 
-const pool = new sql.ConnectionPool(config);
+// Kiểm tra nếu có user và password
+let sqlClient;
+
+if (config.user && config.password) {
+    // Sử dụng tedious (mặc định của mssql)
+    sqlClient = tediousSql;
+    config.driver = 'tedious';  // Sử dụng tedious nếu có user và password
+} else {
+    // Sử dụng msnodesqlv8 nếu không có user và password
+    sqlClient = msnodesqlv8Sql;
+    config.driver = 'msnodesqlv8';  // Sử dụng msnodesqlv8 nếu không có user và password
+}
+
+const pool = new sqlClient.ConnectionPool(config);
 const poolConnect = pool.connect();
 
 poolConnect.then(() => {
@@ -37,11 +43,11 @@ poolConnect.then(() => {
 async function executeQuery(query, params = []) {
     await poolConnect;
     const request = pool.request();
-    
+
     params.forEach(param => {
         request.input(param.name, param.type, param.value);
     });
-    
+
     return request.query(query);
 }
 
@@ -59,11 +65,11 @@ app.get('/api/characters/:id', async (req, res) => {
                 value: parseInt(req.params.id)
             }]
         );
-        
+
         if (result.recordset.length === 0) {
             return res.status(404).json({ error: 'Character not found' });
         }
-        
+
         res.json(result.recordset[0]);
     } catch (err) {
         console.error('Error fetching character by ID:', err);
@@ -85,6 +91,6 @@ app.get('/api', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-    
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
