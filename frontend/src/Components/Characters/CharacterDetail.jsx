@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCharacterById } from '../axios';
-import charactersData from '../Characters/charactersData';
+import charactersData from '../Characters/CharactersData';
 
 const CharacterDetail = () => {
     const { id } = useParams();
