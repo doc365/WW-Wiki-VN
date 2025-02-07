@@ -34,13 +34,13 @@ const CharacterDetail = () => {
     if (!character) return <div>Character not found</div>; // Show not found message
 
     return (
-        <div className="bg-gray-900 text-white p-6 max-w-4xl rounded-lg mx-auto mt-14 mb-12">
-            <div className="flex gap-6">
-                <div className="w-1/3">~
-                    <h1 className="text-3xl font-bold mb-4">{character.name}</h1>
+        <div className="bg-gray-900 text-white p-8 max-w-7xl rounded-lg mx-auto mt-14 mb-14">
+            <div className="flex gap-8">
+                <div className="w-1/2">
+                    <h1 className="text-3xl w-full font-bold mb-4">{character.name}</h1>
                     <img src={character.portrait} alt={character.name} className="w-full h-auto rounded-md" />
                 </div>
-                <div className="w-2/3 space-y-4">
+                <div className="w-1/2 space-y-6">
                     <div className="space-y-2">
                         {[
                             ['Attribute', character.Attribute],
