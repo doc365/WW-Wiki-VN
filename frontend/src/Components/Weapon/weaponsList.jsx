@@ -1,7 +1,7 @@
 // Không cần thiết import React.
 import { FaStar } from "react-icons/fa" // Import star icon from react-icons
 import 'aos/dist/aos.css' // Import AOS CSS
-import CharactersData from '../Characters/CharactersData'; // Import CharactersData
+import CharactersData from '../data/CharactersData'; // Import CharactersData
 
 // WeaponsList component
 const WeaponsList = () => {
