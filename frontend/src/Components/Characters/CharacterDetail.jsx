@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { fetchCharacterById } from '../axios';
-import charactersData from '../Characters/CharactersData';
+import React, { useEffect, useState } from 'react'; // Import React and hooks
+import { useParams } from 'react-router-dom'; // Import useParams hook
+import { fetchCharacterById } from '../axios'; // Import API call function
+import charactersData from '../Characters/CharactersData'; // Import local character data
 
 const CharacterDetail = () => {
-    const { id } = useParams();
-    const [character, setCharacter] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { id } = useParams(); // Get the character ID from the URL parameters
+    const [character, setCharacter] = useState(null); // State to store character data
+    const [loading, setLoading] = useState(true); // State to manage loading state
+    const [error, setError] = useState(null); // State to manage error state
 
     useEffect(() => {
         const getCharacter = async () => {
@@ -15,45 +15,51 @@ const CharacterDetail = () => {
                 // Check if character exists in local data
                 const localCharacter = charactersData.find(char => char.id === parseInt(id));
                 if (localCharacter) {
-                    setCharacter(prevState => ({ ...prevState, ...localCharacter }));
+                    setCharacter(prevState => ({ ...prevState, ...localCharacter })); // Update state with local data
                 }
                 // Fetch character from API
                 const data = await fetchCharacterById(id);
-                setCharacter(prevState => ({ ...prevState, ...data }));
+                setCharacter(prevState => ({ ...prevState, ...data })); // Update state with API data
             } catch (err) {
-                setError(err.message);
+                setError(err.message); // Set error state
             } finally {
-                setLoading(false);
+                setLoading(false); // Set loading state to false
             }
         };
         getCharacter();
-    }, [id]);
+    }, [id]); // Dependency array to re-run effect when ID changes
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: 
-        {error}</div>;
-    if (!character) return <div>Character not found</div>;
+    if (loading) return <div>Loading...</div>; // Show loading message
+    if (error) return <div>Error: {error}</div>; // Show error message
+    if (!character) return <div>Character not found</div>; // Show not found message
 
     return (
-        <div className="container mx-auto mt-14 mb-12">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-                <div className="flex flex-col items-start w-150">
-                    <h1 className="text-3xl font-bold mb-1">{character.name}</h1>
-                    <img src={character.portrait} alt={character.name} className="w-full h-auto max-h rounded-md mb-4" />
-                    {/* Add more character details as needed */}
+        <div className="bg-gray-900 text-white p-6 max-w-4xl rounded-lg mx-auto mt-14 mb-12">
+            <div className="flex gap-6">
+                <div className="w-1/3">~
+                    <h1 className="text-3xl font-bold mb-4">{character.name}</h1>
+                    <img src={character.portrait} alt={character.name} className="w-full h-auto rounded-md" />
                 </div>
-                <div className="bg-gray-100 dark:bg-gray-700 p-5 rounded-md shadow-md">
-                    <p><span className="font-semibold">Attribute:</span> {character.Attribute}</p>
-                    <p><span className="font-semibold">Weapon Type:</span> {character.Weapon_type}</p>
-                    <p><span className="font-semibold">Rarity:</span> {character.Rarity}</p>
-                    <p><span className="font-semibold">Signature Weapon:</span> {character.SigWea}</p>
-                    <p><span className="font-semibold">Stat:</span> {character.Stat}</p>
-                    <p><span className="font-semibold">Tag:</span> {character.Tag}</p>
-                    <p><span className="font-semibold">Description:</span> {character.Description}</p>
+                <div className="w-2/3 space-y-4">
+                    <div className="space-y-2">
+                        {[
+                            ['Attribute', character.Attribute],
+                            ['Weapon Type', character.Weapon_type],
+                            ['Rarity', character.Rarity],
+                            ['Signature Weapon', character.SigWea],
+                            ['Stat', character.Stat],
+                            ['Tag', character.Tag],
+                            ['Description', character.Description]
+                        ].map(([label, value]) => (
+                            <p key={label} className="text-lg">
+                                <span className="font-semibold">{label}:</span> {value}
+                            </p>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-export default CharacterDetail;
+export default CharacterDetail; // Export the component
