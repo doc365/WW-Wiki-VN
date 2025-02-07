@@ -55,7 +55,7 @@ const CharactersData = [
     { id: 24, name: "Camellya", image: Camellya, portrait: PhoebePt, attribute: "Havoc", rarity: 5, weapon_type: "Sword" },
     { id: 25, name: "Carlotta", image: Carlotta, portrait: PhoebePt, attribute: "Glacio", rarity: 5, weapon_type: "Pistols" },
     { id: 26, name: "Roccia", image: Roccia, portrait: PhoebePt, attribute: "Havoc", rarity: 5, weapon_type: "Gauntlet" },
-    { id: 27, name: "Phoebe", image: Phoebe, portrait: PhoebePt},
+    { id: 27, name: "Phoebe", image: Phoebe, portrait: PhoebePt, attribute: "Spectro", rarity: 5, weapon_type: "Rectifier}" },
     { id: 28, name: "Brant", image: Brant, portrait: PhoebePt, attribute: "Fusion", rarity: 5, weapon_type: "Sword" },
 ];
 
