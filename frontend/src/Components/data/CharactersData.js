@@ -28,6 +28,8 @@ import Phoebe from '../../assets/CharactersIcon/27.png'
 import Brant from '../../assets/CharactersIcon/28.png'
 import PhoebePt from '../../assets/CharacterPortrait/PhoebePt.png'
 
+
+
 const CharactersData = [
     { id: 1, name: "Yangyang", image: Yangyang, portrait: PhoebePt, attribute: "Aero", rarity: 4, weapon_type: "Sword" },
     { id: 2, name: "Chixia", image: Chixia, portrait: PhoebePt, attribute: "Fusion", rarity: 4, weapon_type: "Pistols" },

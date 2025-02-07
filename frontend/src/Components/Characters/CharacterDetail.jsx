@@ -1,49 +1,63 @@
-import React, { useEffect, useState } from 'react'; // Import React and hooks
-import { useParams } from 'react-router-dom'; // Import useParams hook from react-router-dom
-import { fetchCharacterById } from '../axios'; // Import fetchCharacterById function
-import charactersData from '../Characters/charactersData'; // Import local characters data
-import CharacterStats from './CharacterStats'; // Import CharacterStats component
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchCharacterById } from '../axios';
+import charactersData from '../data/CharactersData';
 
 const CharacterDetail = () => {
-    const { id } = useParams(); // Get the character ID from the URL parameters
-    const [character, setCharacter] = useState(null); // State to store character data
-    const [loading, setLoading] = useState(true); // State to manage loading state
-    const [error, setError] = useState(null); // State to manage error state
+    const { id } = useParams();
+    const [character, setCharacter] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const getCharacter = async () => {
             try {
-                // Check if character exists in local data
                 const localCharacter = charactersData.find(char => char.id === parseInt(id));
                 if (localCharacter) {
-                    setCharacter(prevState => ({ ...prevState, ...localCharacter })); // Update state with local character data
+                    setCharacter(prevState => ({ ...prevState, ...localCharacter }));
                 }
-                // Fetch character from API
                 const data = await fetchCharacterById(id);
-                setCharacter(prevState => ({ ...prevState, ...data })); // Update state with fetched character data
+                setCharacter(prevState => ({ ...prevState, ...data }));
             } catch (err) {
-                setError(err.message); // Set error message if fetching fails
+                setError(err.message);
             } finally {
-                setLoading(false); // Set loading to false after fetching
+                setLoading(false);
             }
         };
-        getCharacter(); // Call the function to fetch character data
-    }, [id]); // Dependency array to re-run effect when ID changes
+        getCharacter();
+    }, [id]);
 
-    if (loading) return <div>Loading...</div>; // Show loading message if data is still being fetched
-    if (error) return <div>Error: {error}</div>; // Show error message if there was an error
-    if (!character) return <div>Character not found</div>; // Show message if character is not found
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!character) return <div>Character not found</div>;
 
     return (
-        <div className="bg-gray-900 text-white p-6 max-w-7xl rounded-lg mx-auto mt-14 mb-12"> {/* Character detail container */}
-            <div className="flex gap-6"> {/* Flex container with gap */}
-                <div className="w-1/2"> {/* Character image and name */}
-                    <h1 className="text-3xl font-bold mb-4 ">{character.name}</h1> {/* Character name */}
-                    <img src={character.portrait} alt={character.name} className="w-full h-auto rounded-md " /> {/* Character image */}
+        <div className="bg-gray-900 text-white p-8 max-w-7xl rounded-lg mx-auto mt-14 mb-14">
+            <div className="flex gap-8">
+                <div className="w-1/2 relative">
+                    <img 
+                        src={character.portrait} 
+                        alt={character.name} 
+                        className="w-full h-auto rounded-md"
+                    />
+                    <div className="absolute bottom-4 right-4 bg-gray-800/80 backdrop-blur-sm text-white p-4 rounded-lg">
+                        <p className="text-2xl font-semibold">{character.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                            <div className="w-6 h-6">
+                                <img src="/spectro-icon.png" alt="Spectro" className="w-full h-full" />
+                            </div>
+                            <p className="text-lg">Spectro</p>
+                        </div>
+                        <div className="flex gap-1 mt-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <span key={star} className="text-yellow-400 text-xl">★</span>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-                <div className="w-1/2 space-y-4"> {/* Character details */}
-                    <CharacterStats />
-                    <div className="space-y-2"> {/* Character information */}
+                
+                <div className="w-1/2 space-y-6">
+                    <div className="space-y-2">
                         {[
                             ['Attribute', character.Attribute],
                             ['Weapon Type', character.Weapon_type],
@@ -52,9 +66,9 @@ const CharacterDetail = () => {
                             ['Stat', character.Stat],
                             ['Tag', character.Tag],
                             ['Description', character.Description]
-                        ].map(([label, value]) => ( // Map through character details
-                            <p key={label} className="text-2xl ml-7"> {/* Increase text size to text-2xl and add left margin */}
-                                <span className="font-semibold">{label}:</span> {value} {/* Display label and value */}
+                        ].map(([label, value]) => (
+                            <p key={label} className="text-lg">
+                                <span className="font-semibold">{label}:</span> {value}
                             </p>
                         ))}
                     </div>
@@ -64,4 +78,4 @@ const CharacterDetail = () => {
     );
 };
 
-export default CharacterDetail; // Export the CharacterDetail component
+export default CharacterDetail;
