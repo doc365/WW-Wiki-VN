@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCharacterById } from '../axios';
 import charactersData from '../data/CharactersData';
+import icondata from '../data/IconData'; // Import icondata
 
 const CharacterDetail = () => {
     const { id } = useParams();
@@ -40,29 +41,31 @@ const CharacterDetail = () => {
                         alt={character.name} 
                         className="w-full h-auto rounded-md"
                     />
-                    <div className="absolute bottom-4 right-4 bg-gray-800/80 backdrop-blur-sm text-white p-4 rounded-lg">
+                    <div className="absolute bottom-13 right-15 bg-gray-800/70 backdrop-blur-md text-white p-4 rounded-lg">
                         <p className="text-2xl font-semibold">{character.name}</p>
                         <div className="flex items-center gap-2 mt-1">
-                            <div className="w-6 h-6">
-                                <img src="/spectro-icon.png" alt="Spectro" className="w-full h-full" />
+                            <div className="w-20 h-10">
+                                <img src={icondata.Spectro} alt={character.Attribute} className="w-full h-full" /> 
                             </div>
-                            <p className="text-lg">Spectro</p>
+                            <p className="text-lg">{character.Attribute}</p> 
                         </div>
                         <div className="flex gap-1 mt-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <span key={star} className="text-yellow-400 text-xl">★</span>
+                            {[...Array(character.Rarity)].map((_, index) => (
+                                <span key={index} className="text-yellow-400 text-xl">★</span>
                             ))}
                         </div>
                     </div>
                 </div>
                 
                 <div className="w-1/2 space-y-6">
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {[
                             ['Attribute', character.Attribute],
-                            ['Weapon Type', character.Weapon_type],
-                            ['Rarity', character.Rarity],
-                            ['Signature Weapon', character.SigWea],
+                            ['Weapon', character.Weapon_type],
+                            ['Rarity', [...Array(character.Rarity)].map((_, index) => (
+                                <span key={index} className="text-yellow-400 text-xl">★</span>
+                            ))],
+                            ['Signature', character.SigWea],
                             ['Stat', character.Stat],
                             ['Tag', character.Tag],
                             ['Description', character.Description]
