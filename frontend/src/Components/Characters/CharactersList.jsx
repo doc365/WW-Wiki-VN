@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'; // Import useEffect and useState hooks
 import { FaStar } from "react-icons/fa";
-import 'aos/dist/aos.css';
 import { Link } from 'react-router-dom';
 
 // Characters component
@@ -9,7 +8,7 @@ const Characters = () => {
 
     useEffect(() => {
         // Fetch character data from API
-        fetch('http://localhost:5000/api/characters')
+        fetch('http://localhost:5000/api')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

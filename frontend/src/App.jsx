@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-
 import Characters from './Components/Characters/Characters.jsx';
 import CharacterDetail from './Components/Characters/CharacterDetail.jsx';
 import WeaponsList from './Components/Weapon/weaponsList.jsx';
