@@ -1,15 +1,151 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchCharacterById } from '../axios';
 import charactersData from '../data/CharactersData';
 import icondata from '../data/IconData';
+
+// Update StatRow component to have larger icon
+const StatRow = memo(({ label, value, icon }) => (
+    <div className="flex justify-between items-center p-3 bg-gray-900 border-b border-gray-800">
+        <span className="text-gray-300">{label}</span>
+        <div className="flex items-center gap-2">
+            <span className="text-white">{value}</span>
+            {icon && <img src={icon} alt={value} className="w-8 h-8" />}
+        </div>
+    </div>
+));
+
+const CharacterPortrait = memo(({ character }) => (
+    <div className="w-1/2 relative">
+        <img 
+            src={character.portrait} 
+            alt={character.name} 
+            className="w-full h-auto rounded-md"
+        />
+        <div className="absolute bottom-0 right-0 bg-gray-800/70 backdrop-blur-md p-4 rounded-lg">
+            <p className="text-2xl font-semibold">{character.name}</p>
+            <div className="flex items-center gap-2">
+                <p className="text-lg">{character.Attribute}</p>
+                <img 
+                    src={icondata[character.Attribute]} 
+                    alt={character.Attribute}
+                    className="w-8 h-8"
+                />
+            </div>
+            <div className="flex justify-center gap-1 mt-2">
+                {[...Array(character.Rarity)].map((_, index) => (
+                    <span key={index} className="text-yellow-400 text-xl">★</span>
+                ))}
+            </div>
+        </div>
+    </div>
+));
+
+const StatsPanel = memo(({ character }) => (
+    <div className="w-1/2">
+        <div className="bg-gray-950 rounded-lg overflow-hidden">
+            <div className="p-4">
+                <h2 className="text-2xl font-bold">Ascension Stats</h2>
+                <div className="text-blue-500 mb-4">CHARACTER STATS</div>
+                
+                <div className="divide-y divide-gray-700 bg-gray-950 rounded-lg">
+                    {Object.entries({
+                        Level: "90",
+                        "Base HP": character.HP,
+                        "Base ATK": character.ATK,
+                        "Base DEF": character.DEF,
+                        "ER": `${character.ER}%`,
+                        "Crit Rate": `${character.CR}%`,
+                        "Crit DMG": `${character.CD}%`,
+                        "Weapon Type": character.Weapon_type,
+                        "Signature Weapon": character.SigWea,
+                        "Description": character.Description,
+                        "Attribute": character.Attribute
+                    }).map(([label, value]) => (
+                        <StatRow 
+                            key={label} 
+                            label={label} 
+                            value={value}
+                            icon={label === "Attribute" ? icondata[value] : null}
+                        />
+                    ))}
+                </div>
+            </div>
+            <div className="p-4">
+                <button className="w-full p-3 text-center border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
+                    {character.Tag}
+                </button>
+            </div>
+        </div>
+    </div>
+));
+
+const MaterialsSection = memo(({ title, materials = [] }) => (
+    <div className="w-1/2 p-4 bg-gray-800 rounded-lg">
+        <h2 className="text-xl font-semibold mb-2 text-blue-500">{title}</h2>
+        <div className="grid grid-cols-4 gap-4">
+            {materials.map((material, index) => (
+                <div key={index} className="flex items-center gap-2">
+                    <img src={material.image} alt={material.name} className="w-8 h-8" />
+                    <span className="text-white">{material.name}</span>
+                </div>
+            ))}
+        </div>
+    </div>
+));
+
+const SkillTab = memo(({ skill, isActive, onClick }) => (
+    <button 
+        onClick={onClick}
+        className={`p-2 text-blue-500 font-bold hover:bg-gray-700 rounded-lg transition-colors ${
+            isActive ? 'bg-gray-700' : ''
+        }`}
+    >
+        {skill}
+    </button>
+));
+
+const SkillContent = memo(({ skillType, skills = [] }) => {
+    const [openSkills, setOpenSkills] = useState({}); // Track open/closed state for each skill
+
+    const toggleSkill = (skillId) => {
+        setOpenSkills(prev => ({
+            ...prev,
+            [skillId]: !prev[skillId]
+        }));
+    };
+
+    return (
+        <div className="bg-gray-800 rounded-lg p-4 mb-4">
+            <h2 className="text-xl font-semibold mb-4 text-blue-500">{skillType}</h2>
+            <div className="grid gap-4">
+                {skills.map((skill, index) => (
+                    <div key={index} className="bg-gray-700 rounded-lg overflow-hidden">
+                        <div 
+                            onClick={() => toggleSkill(index)}
+                            className="flex items-start gap-4 p-4 cursor-pointer hover:bg-gray-600 transition-colors"
+                        >
+                            <img src={skill.image} alt={skill.name} className="w-12 h-12 rounded" />
+                            <h3 className="font-semibold text-white">{skill.name}</h3>
+                        </div>
+                        {openSkills[index] && skill.description && (
+                            <div className="px-4 pb-4 pt-2 border-t border-gray-600">
+                                <p className="text-gray-300">{skill.description}</p>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+});
 
 const CharacterDetail = () => {
     const { id } = useParams();
     const [character, setCharacter] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedSkill, setSelectedSkill] = useState('basic-attack'); // Default to "Basic Attack"
+    const [selectedSkill, setSelectedSkill] = useState('basic-attack');
 
     useEffect(() => {
         const getCharacter = async () => {
@@ -29,301 +165,77 @@ const CharacterDetail = () => {
         getCharacter();
     }, [id]);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!character) return <div>Character not found</div>;
-
-    // Helper component for stat rows
-    const StatRow = ({ label, value, icon }) => (
-        <div className="flex justify-between items-center p-3 bg-gray-900 border-b border-gray-800">
-            <span className="text-gray-300">{label}</span>
-            <div className="flex items-center gap-2">
-                {icon && <img src={icon} alt={label} className="w-8 h-8" />}
-                <span className="text-white">{value}</span>
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-white text-xl">Loading...</div>
             </div>
-        </div>
-    );
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-red-500 text-xl">Error: {error}</div>
+            </div>
+        );
+    }
+
+    if (!character) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-white text-xl">Character not found</div>
+            </div>
+        );
+    }
+
+    const SKILL_TYPES = [
+        'basic-attack',
+        'resonance-skill',
+        'forte-circuit',
+        'resonance-liberation',
+        'intro-skill',
+        'oturo-skill'
+    ];
+
+    const formatSkillType = (type) => 
+        type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     return (
-        <div className="bg-gray-900 text-white p-8 max-w-7xl rounded-lg mx-auto mt-14 mb-14">
+        <div className="bg-gray-900/80 backdrop-blur-sm text-white p-8 max-w-7xl mx-auto mt-14 mb-14 rounded-lg">
             <div className="flex justify-center gap-8">
-                {/* Left side - Portrait */}
-                <div className="w-1/2 relative">
-                    <img 
-                        src={character.portrait} 
-                        alt={character.name} 
-                        className="w-full h-auto rounded-md"
-                    />
-                    <div className="absolute bottom-13 right-15 bg-gray-800/70 backdrop-blur-md justify-center text-white p-4 rounded-lg">
-                        <p className="text-2xl font-semibold">{character.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <p className="text-lg flex items-center gap-2">
-                                <img src={icondata[character.Attribute]} alt={character.Attribute} className="w-12 h-12" />
-                                {character.Attribute}
-                            </p>
-                        </div>
-                        <div className="flex justify-center gap-1 mt-2">
-                            {[...Array(character.Rarity)].map((_, index) => (
-                                <span key={index} className="text-yellow-400 text-xl">★</span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right side - Stats */}
-                <div className="w-1/2">
-                    <div className="bg-gray-950 rounded-lg overflow-hidden">
-                        {/* Header */}
-                        <div className="p-4">
-                            <h1 className="text-2xl font-bold">Ascension Stats</h1>
-                            <div className="text-blue-500 mb-4">CHARACTER STATS </div>
-                            
-                            {/* Stats Grid */}
-                            <div className="divide-y divide-gray-700 bg-gray-950 rounded-lg">
-                                <StatRow label="Level" value="90" />
-                                <StatRow label="Base HP" value={character.HP} />
-                                <StatRow label="Base ATK" value={character.ATK} />
-                                <StatRow label="Base DEF" value={character.DEF} />
-                                <StatRow label="ER" value={`${character.ER}%`} />
-                                <StatRow label="Crit Rate" value={`${character.CR}%`} />
-                                <StatRow label="Crit DMG" value={`${character.CD}%`} />
-                                <StatRow 
-                                    label="Attribute" 
-                                    value={
-                                        <div className="flex items-center gap-2">
-                                            {character.Attribute}
-                                            <img src={icondata[character.Attribute]} alt={character.Attribute} className="w-8 h-8" />
-                                        </div>
-                                    }
-                                />
-                                <StatRow label="Weapon Type" value={character.Weapon_type} />
-                                <StatRow label="Signature Weapon" value={character.SigWea} />
-                                <StatRow label="Description" value={character.Description} />
-                            </div>
-                        </div>
-
-                        {/* Tag Section */}
-                        <div className="p-4">
-                            <button className="w-full p-3 text-center border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
-                                {character.Tag}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <CharacterPortrait character={character} />
+                <StatsPanel character={character} />
             </div>
 
             <div className="flex justify-center gap-8 mt-8">
-                {/* Materials Needed Box */}
-                <div className="w-1/2 p-4 bg-gray-800 rounded-lg">
-                    <h2 className="text-xl font-semibold mb-2 text-blue-500">Materials Needed</h2>
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/material1.png" alt="Material 1" className="w-8 h-8" />
-                            <span className="text-white">Material 1</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/material2.png" alt="Material 2" className="w-8 h-8" />
-                            <span className="text-white">Material 2</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/material3.png" alt="Material 3" className="w-8 h-8" />
-                            <span className="text-white">Material 3</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/material4.png" alt="Material 4" className="w-8 h-8" />
-                            <span className="text-white">Material 4</span>
-                        </div>
-                    </div>
-                </div>
+                <MaterialsSection title="Materials Needed" />
+                <MaterialsSection title="Ascension Skill Material" />
+            </div>
 
-                {/* Ascension Skill Material Box */}
-                <div className="w-1/2 p-4 bg-gray-800 rounded-lg">
-                    <h2 className="text-xl font-semibold mb-2 text-blue-500">Ascension Skill Material</h2>
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/skillMaterial1.png" alt="Skill Material 1" className="w-8 h-8" />
-                            <span className="text-white">Skill Material 1</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/skillMaterial2.png" alt="Skill Material 2" className="w-8 h-8" />
-                            <span className="text-white">Skill Material 2</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/skillMaterial3.png" alt="Skill Material 3" className="w-8 h-8" />
-                            <span className="text-white">Skill Material 3</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <img src="/path/to/skillMaterial4.png" alt="Skill Material 4" className="w-8 h-8" />
-                            <span className="text-white">Skill Material 4</span>
-                        </div>
+            <div className="mt-8">
+                <div className="bg-gray-800 rounded-lg p-4">
+                    <h2 className="text-xl font-bold mb-4 text-blue-400">Skills & Passives</h2>
+                    <div className="flex gap-4 mb-6 overflow-x-auto p-2">
+                        {SKILL_TYPES.map(skill => (
+                            <SkillTab
+                                key={skill}
+                                skill={formatSkillType(skill)}
+                                isActive={selectedSkill === skill}
+                                onClick={() => setSelectedSkill(skill)}
+                            />
+                        ))}
                     </div>
-                </div>
-            </div>        
-            <div className="flex justify-center gap-8 mt-8">
-                {/* Navbar for Skills and Passives */}
-                <div className="w-full p-4 bg-gray-800 rounded-lg">
-                    <h2 className="text-xl font-bold mb-2 text-blue-400 left spacing">Skills & Passives</h2>
-                    <nav className="flex justify-around mb-4">
-                        <button onClick={() => setSelectedSkill('basic-attack')} className="text-blue-500 font-bold hover:underline">Basic Attack</button>
-                        <button onClick={() => setSelectedSkill('resonance-skill')} className="text-blue-500 font-bold hover:underline">Resonance Skill</button>
-                        <button onClick={() => setSelectedSkill('forte-circuit')} className="text-blue-500 font-bold hover:underline">Forte Circuit</button>
-                        <button onClick={() => setSelectedSkill('resonance-liberation')} className="text-blue-500 font-bold hover:underline">Resonance Liberation</button>
-                        <button onClick={() => setSelectedSkill('intro-skill')} className="text-blue-500 font-bold hover:underline">Intro Skill</button>
-                        <button onClick={() => setSelectedSkill('oturo-skill')} className="text-blue-500 font-bold hover:underline">Oturo Skill</button>
-                    </nav>
-                    <div>
-                    {selectedSkill === 'basic-attack' && (
-                        <div id="basic-attack" className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-500">Basic Attack</h2>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/normalAttack1.png" alt="Normal Attack 1" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Normal Attack 1</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/normalAttack2.png" alt="Normal Attack 2" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Normal Attack 2</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/normalAttack3.png" alt="Normal Attack 3" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Normal Attack 3</span>
-                                </div>
-                            </div>
-                        </div>
+                    {SKILL_TYPES.map(skill => 
+                        selectedSkill === skill && (
+                            <SkillContent 
+                                key={skill}
+                                skillType={formatSkillType(skill)}
+                                skills={character[`${skill}Skills`] || []}
+                            />
+                        )
                     )}
-                    {selectedSkill === 'resonance-skill' && (
-                        <div id="resonance-skill" className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-500">Resonance Skill</h2>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/resonanceSkill1.png" alt="Resonance Skill 1" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Resonance Skill 1</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/resonanceSkill2.png" alt="Resonance Skill 2" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Resonance Skill 2</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/resonanceSkill3.png" alt="Resonance Skill 3" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Resonance Skill 3</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {selectedSkill === 'forte-circuit' && (
-                        <div id="forte-circuit" className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-500">Forte Circuit</h2>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/forteCircuit1.png" alt="Forte Circuit 1" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Forte Circuit 1</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/forteCircuit2.png" alt="Forte Circuit 2" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Forte Circuit 2</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/forteCircuit3.png" alt="Forte Circuit 3" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Forte Circuit 3</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {selectedSkill === 'resonance-liberation' && (
-                        <div id="resonance-liberation" className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-500">Resonance Liberation</h2>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/resonanceLiberation1.png" alt="Resonance Liberation 1" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Resonance Liberation 1</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/resonanceLiberation2.png" alt="Resonance Liberation 2" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Resonance Liberation 2</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/resonanceLiberation3.png" alt="Resonance Liberation 3" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Resonance Liberation 3</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {selectedSkill === 'intro-skill' && (
-                        <div id="intro-skill" className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-500">Intro Skill</h2>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/introSkill1.png" alt="Intro Skill 1" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Intro Skill 1</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/introSkill2.png" alt="Intro Skill 2" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Intro Skill 2</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/introSkill3.png" alt="Intro Skill 3" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Intro Skill 3</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {selectedSkill === 'oturo-skill' && (
-                        <div id="oturo-skill" className="bg-gray-800 rounded-lg p-4 mb-4">
-                            <h2 className="text-xl font-semibold mb-2 text-blue-500">Oturo Skill</h2>
-                            <div className="grid grid-cols-3 gap-2">
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/oturoSkill1.png" alt="Oturo Skill 1" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Oturo Skill 1</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/oturoSkill2.png" alt="Oturo Skill 2" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Oturo Skill 2</span>
-                                </div>
-                                <div className="flex items-center gap-2 col-span-1">
-                                    <img src="/path/to/oturoSkill3.png" alt="Oturo Skill 3" className="w-8 h-8" />
-                                </div>
-                                <div className="flex items-center gap-2 col-span-2">
-                                    <span className="text-white">Oturo Skill 3</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    </div>
-                </div>
+                </div>  
             </div>
         </div>
     );
