@@ -3,6 +3,10 @@ const sql = require('mssql/msnodesqlv8');
 const cors = require('cors');
 const app = express();
 
+// Cache for storing frequently accessed data
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 // Enable CORS
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -14,12 +18,19 @@ app.use(cors({
 // Middleware to parse JSON
 app.use(express.json());
 
-// Configure the database connection
+// Improved database connection handling
 const pool = new sql.ConnectionPool({
     server: 'MUDDY',
     database: 'WutheringWavesDB5',
     options: {
-        trustedConnection: true
+        trustedConnection: true,
+        enableArithAbort: true,
+        trustServerCertificate: true
+    },
+    pool: {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000
     }
 });
 const poolConnect = pool.connect();
@@ -33,24 +44,47 @@ pool.connect(err => {
     }
 });
 
-// Function to execute SQL queries
-async function executeQuery(query, params = []) {
+// Enhanced error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(err.status || 500).json({
+        success: false,
+        error: err.message || 'Internal Server Error'
+    });
+});
+
+// Optimized query execution with caching
+async function executeQuery(query, params = [], cacheKey = null) {
+    if (cacheKey && cache.has(cacheKey)) {
+        const cached = cache.get(cacheKey);
+        if (Date.now() - cached.timestamp < CACHE_DURATION) {
+            return cached.data;
+        }
+        cache.delete(cacheKey);
+    }
+
     await poolConnect;
     const request = pool.request();
-
-    // Add parameters to the SQL request
-    params.forEach(param => {
-        request.input(param.name, param.type, param.value);
-    });
-
-    return request.query(query);
+    params.forEach(param => request.input(param.name, param.type, param.value));
+    
+    const result = await request.query(query);
+    
+    if (cacheKey) {
+        cache.set(cacheKey, {
+            timestamp: Date.now(),
+            data: result
+        });
+    }
+    
+    return result;
 }
 
 // Get character details by ID with ALL related data
-app.get('/api/characters/:id', async (req, res) => {
+app.get('/api/characters/:id', async (req, res, next) => {
     try {
-        const result = await executeQuery(`
-            SELECT 
+        const cacheKey = `character_${req.params.id}`;
+        const result = await executeQuery(
+            `SELECT 
                 c.CharacterID,
                 c.CharacterName,
                 c.Attribute,
@@ -114,7 +148,8 @@ app.get('/api/characters/:id', async (req, res) => {
                 ) as StatBonuses
             FROM Characters c
             WHERE c.CharacterID = @Id`,
-            [{ name: 'Id', type: sql.Int, value: parseInt(req.params.id) }]
+            [{ name: 'Id', type: sql.Int, value: parseInt(req.params.id) }],
+            cacheKey
         );
 
         if (result.recordset.length === 0) {
@@ -203,30 +238,6 @@ app.get('/api/milestone_levels', async (req, res) => {
     }
 });
 
-// Get stat bonuses for characters
-app.get('/api/stat_bonuses', async (req, res) => {
-    try {
-        const result = await executeQuery(`
-            SELECT 
-                csb.CharacterID,
-                c.CharacterName,
-                sbt1.StatBonusName as Bonus1Name,
-                sbt1.Milestone1_Percentage as Bonus1_M1_Percentage,
-                sbt1.Milestone2_Percentage as Bonus1_M2_Percentage,
-                sbt2.StatBonusName as Bonus2Name,
-                sbt2.Milestone1_Percentage as Bonus2_M1_Percentage,
-                sbt2.Milestone2_Percentage as Bonus2_M2_Percentage
-            FROM Character_Stat_Bonus csb
-            JOIN Characters c ON csb.CharacterID = c.CharacterID
-            JOIN Stat_Bonus_Types sbt1 ON csb.Bonus1ID = sbt1.StatBonusID
-            JOIN Stat_Bonus_Types sbt2 ON csb.Bonus2ID = sbt2.StatBonusID
-        `);
-        res.json({ data: result.recordset });
-    } catch (err) {
-        console.error('Error fetching stat bonuses:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
 
 // Add new endpoint for materials
 app.get('/api/materials', async (req, res) => {
@@ -246,6 +257,13 @@ app.get('/api/materials', async (req, res) => {
         console.error('Error fetching materials:', err);
         res.status(500).json({ error: err.message });
     }
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', async () => {
+    console.log('Received SIGTERM. Closing HTTP server and DB pool...');
+    await pool.close();
+    process.exit(0);
 });
 
 // Start the server
