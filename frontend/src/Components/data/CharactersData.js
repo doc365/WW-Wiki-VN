@@ -1,32 +1,32 @@
 // ImageIcon imports
-import Yangyang from '../../assets/Character/CharactersIcon/1.png'
-import Chixia from '../../assets/Character/CharactersIcon/2.png'
-import Baizhi from '../../assets/Character/CharactersIcon/3.png'
-import Sanhua from '../../assets/Character/CharactersIcon/4.png'
-import Aalto from '../../assets/Character/CharactersIcon/5.png'
-import Encore from '../../assets/Character/CharactersIcon/6.png'
-import Jiaxin from '../../assets/Character/CharactersIcon/7.png'
-import Jiyan from '../../assets/Character/CharactersIcon/8.png'
-import Mortefi from '../../assets/Character/CharactersIcon/9.png'
-import Yuanwu from '../../assets/Character/CharactersIcon/10.png'
-import Verina from '../../assets/Character/CharactersIcon/11.png'
-import Taoqi from '../../assets/Character/CharactersIcon/12.png'
-import Lingyang from '../../assets/Character/CharactersIcon/13.png'
-import Calcharo from '../../assets/Character/CharactersIcon/14.png'
-import Danjin from '../../assets/Character/CharactersIcon/15.png'
-import Yinlin from '../../assets/Character/CharactersIcon/16.png'
-import Jinhsi from '../../assets/Character/CharactersIcon/17.png'
-import Changli from '../../assets/Character/CharactersIcon/18.png'
-import Youhu from '../../assets/Character/CharactersIcon/19.png'
-import Lumi from '../../assets/Character/CharactersIcon/20.png'
-import Zhezhi from '../../assets/Character/CharactersIcon/21.png'
-import XY from '../../assets/Character/CharactersIcon/22.png'
-import SK from '../../assets/Character/CharactersIcon/23.png'
-import Camellya from '../../assets/Character/CharactersIcon/24.png'
-import Carlotta from '../../assets/Character/CharactersIcon/25.png'
-import Roccia from '../../assets/Character/CharactersIcon/26.png'
-import Phoebe from '../../assets/Character/CharactersIcon/27.png'
-import Brant from '../../assets/Character/CharactersIcon/28.png'
+import Baizhi from '../../assets/Character/CharactersIcon/Baizhi.png'
+import Sanhua from '../../assets/Character/CharactersIcon/Sanhua.png'
+import Aalto from '../../assets/Character/CharactersIcon/Aalto.png'
+import Encore from '../../assets/Character/CharactersIcon/Encore.png'
+import Jiaxin from '../../assets/Character/CharactersIcon/Jiaxin.png'
+import Jiyan from '../../assets/Character/CharactersIcon/Jiyan.png'
+import Mortefi from '../../assets/Character/CharactersIcon/Mortefi.png'
+import Yuanwu from '../../assets/Character/CharactersIcon/Yuanwu.png'
+import Verina from '../../assets/Character/CharactersIcon/Verina.png'
+import Taoqi from '../../assets/Character/CharactersIcon/Taoqi.png'
+import Lingyang from '../../assets/Character/CharactersIcon/Lingyang.png'
+import Calcharo from '../../assets/Character/CharactersIcon/Calcharo.png'
+import Danjin from '../../assets/Character/CharactersIcon/Danjin.png'
+import Yinlin from '../../assets/Character/CharactersIcon/Yinlin.png'
+import Jinhsi from '../../assets/Character/CharactersIcon/Jinhsi.png'
+import Changli from '../../assets/Character/CharactersIcon/Changli.png'
+import Youhu from '../../assets/Character/CharactersIcon/Youhu.png'
+import Lumi from '../../assets/Character/CharactersIcon/Lumi.png'
+import Zhezhi from '../../assets/Character/CharactersIcon/Zhezhi.png'
+import XiangliYao from '../../assets/Character/CharactersIcon/Xiangli.Yao.png'
+import Shorekeeper from '../../assets/Character/CharactersIcon/Shorekeeper.png'
+import Camellya from '../../assets/Character/CharactersIcon/Camellya.png'
+import Carlotta from '../../assets/Character/CharactersIcon/Carlotta.png'
+import Roccia from '../../assets/Character/CharactersIcon/Roccia.png'
+import Phoebe from '../../assets/Character/CharactersIcon/Phoebe.png'
+import Brant from '../../assets/Character/CharactersIcon/Brant.png'
+import Chixia from '../../assets/Character/CharactersIcon/Chixia.png'
+import Yangyang from '../../assets/Character/CharactersIcon/Yangyang.png'
 
 // Portrait imports
 import PhoebePt from '../../assets/Character/CharacterPortrait/PhoebePt.png'
@@ -81,8 +81,8 @@ const CharactersData = [
     { name: "Youhu", image: Youhu, portrait: YouhuPt },
     { name: "Lumi", image: Lumi, portrait: LumiPt },
     { name: "Zhezhi", image: Zhezhi, portrait: ZhezhiPt },
-    { name: "Xiangli Yao", image: XY, portrait: XYPt },
-    { name: "Shorekeeper", image: SK, portrait: SKPt },
+    { name: "Xiangli Yao", image: XiangliYao, portrait: XYPt },
+    { name: "Shorekeeper", image: Shorekeeper, portrait: SKPt },
     { name: "Camellya", image: Camellya, portrait: CamellyaPt },
     { name: "Carlotta", image: Carlotta, portrait: CarlottaPt },
     { name: "Roccia", image: Roccia, portrait: RocciaPt },

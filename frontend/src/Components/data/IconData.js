@@ -25,7 +25,6 @@ const IconData = {
     Pistols: Pistols,
     Rectifier: Rectifier,
     Sword: Sword
-    
 };
 
 export default IconData; // Export IconData
