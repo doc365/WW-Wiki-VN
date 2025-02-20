@@ -3,283 +3,352 @@ const sql = require('mssql/msnodesqlv8');
 const cors = require('cors');
 const app = express();
 
-// Cache for storing frequently accessed data
-const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Environment variables (consider moving to .env file)
+const CONFIG = {
+    PORT: 5000,
+    CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
+    DB: {
+        server: 'MUDDY',
+        database: 'WutheringWavesDB5',
+        options: {
+            trustedConnection: true,
+            enableArithAbort: true,
+            trustServerCertificate: true
+        },
+        pool: {
+            max: 10,
+            min: 0,
+            idleTimeoutMillis: 30000
+        }
+    },
+    CORS: {
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type'],
+        credentials: true
+    }
+};
 
-// Enable CORS
-app.use(cors({
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
-    credentials: true
-}));
+// Cache implementation with automatic cleanup
+class Cache {
+    constructor(duration) {
+        this.store = new Map();
+        this.duration = duration;
+        
+        // Cleanup expired entries every minute
+        setInterval(() => this.cleanup(), 60000);
+    }
 
-// Middleware to parse JSON
+    set(key, value) {
+        this.store.set(key, {
+            timestamp: Date.now(),
+            data: value
+        });
+    }
+
+    get(key) {
+        const entry = this.store.get(key);
+        if (!entry) return null;
+        
+        if (Date.now() - entry.timestamp > this.duration) {
+            this.store.delete(key);
+            return null;
+        }
+        
+        return entry.data;
+    }
+
+    cleanup() {
+        const now = Date.now();
+        for (const [key, entry] of this.store.entries()) {
+            if (now - entry.timestamp > this.duration) {
+                this.store.delete(key);
+            }
+        }
+    }
+}
+
+const cache = new Cache(CONFIG.CACHE_DURATION);
+
+// Middleware setup
+app.use(cors(CONFIG.CORS));
 app.use(express.json());
 
-// Improved database connection handling
-const pool = new sql.ConnectionPool({
-    server: 'MUDDY',
-    database: 'WutheringWavesDB5',
-    options: {
-        trustedConnection: true,
-        enableArithAbort: true,
-        trustServerCertificate: true
+// Database connection setup
+const pool = new sql.ConnectionPool(CONFIG.DB);
+let poolConnect = pool.connect();
+
+pool.on('error', err => {
+    console.error('Database pool error:', err);
+    // Attempt to reconnect
+    poolConnect = pool.connect();
+});
+
+// Query execution with improved error handling and caching
+async function executeQuery(query, params = [], cacheKey = null) {
+    try {
+        if (cacheKey) {
+            const cachedResult = cache.get(cacheKey);
+            if (cachedResult) return cachedResult;
+        }
+
+        await poolConnect;
+        const request = pool.request();
+        
+        params.forEach(param => {
+            if (!param.name || !param.type) {
+                throw new Error('Invalid parameter format');
+            }
+            request.input(param.name, param.type, param.value);
+        });
+        
+        const result = await request.query(query);
+        
+        if (cacheKey) {
+            cache.set(cacheKey, result);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Query execution error:', error);
+        throw new Error('Database query failed: ' + error.message);
+    }
+}
+
+// Character routes
+const characterRoutes = {
+    async getById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id || isNaN(parseInt(id))) {
+                return res.status(400).json({ error: 'Invalid character ID' });
+            }
+
+            const cacheKey = `character_${id}`;
+            const result = await executeQuery(`
+                WITH LevelStatsCTE AS (
+                    SELECT 
+                        JSON_QUERY((
+                            SELECT cls.Level, cls.RankID, cls.HP, cls.ATK, cls.DEF,
+                                ISNULL(cls.ER, 100.00) as EnergyRecharge,
+                                ISNULL(cls.CritRate, 5.00) as CritRate,
+                                ISNULL(cls.CritDamage, 150.00) as CritDamage,
+                                rl.LevelMin, rl.LevelMax, ml.EXP_Required
+                            FROM Character_Level_Stats cls
+                            JOIN Rank_Levels rl ON cls.RankID = rl.RankID
+                            LEFT JOIN Milestone_Levels ml ON ml.RankID = cls.RankID
+                            WHERE cls.CharacterID = @Id
+                            FOR JSON PATH
+                        )) as LevelStats
+                ),
+                TagsCTE AS (
+                    SELECT 
+                        JSON_QUERY((
+                            SELECT t.TagName
+                            FROM Character_Tags ct
+                            JOIN Tags t ON ct.TagID = t.TagID
+                            WHERE ct.CharacterID = @Id
+                            FOR JSON PATH
+                        )) as CharacterTags
+                ),
+                SkillsCTE AS (
+                    SELECT 
+                        JSON_QUERY((
+                            SELECT s.SkillID, s.SkillName, s.SkillType, s.SkillDescription,
+                                (
+                                    SELECT slm.Level, m.MaterialID, m.MaterialName,
+                                        m.MaterialType, m.Rarity as MaterialRarity,
+                                        m.ValueNumber, slm.Quantity
+                                    FROM Skill_Level_Materials slm
+                                    JOIN Materials m ON slm.MaterialID = m.MaterialID
+                                    WHERE slm.SkillID = s.SkillID
+                                    FOR JSON PATH
+                                ) as SkillMaterials
+                            FROM Skills s
+                            WHERE s.CharacterID = @Id
+                            FOR JSON PATH
+                        )) as CharacterSkills
+                ),
+                StatBonusCTE AS (
+                    SELECT 
+                        JSON_QUERY((
+                            SELECT csb.CharacterStatBonusID,
+                                sbt1.StatBonusName as Bonus1Name,
+                                sbt1.Milestone1_Percentage as Bonus1_M1_Percentage,
+                                sbt1.Milestone2_Percentage as Bonus1_M2_Percentage,
+                                sbt2.StatBonusName as Bonus2Name,
+                                sbt2.Milestone1_Percentage as Bonus2_M1_Percentage,
+                                sbt2.Milestone2_Percentage as Bonus2_M2_Percentage
+                            FROM Character_Stat_Bonus csb
+                            JOIN Stat_Bonus_Types sbt1 ON csb.Bonus1ID = sbt1.StatBonusID
+                            JOIN Stat_Bonus_Types sbt2 ON csb.Bonus2ID = sbt2.StatBonusID
+                            WHERE csb.CharacterID = @Id
+                            FOR JSON PATH
+                        )) as StatBonuses
+                )
+                SELECT 
+                    c.CharacterID,
+                    c.CharacterName,
+                    c.Attribute,
+                    c.WeaponType,
+                    c.Rarity,
+                    ls.LevelStats,
+                    t.CharacterTags,
+                    s.CharacterSkills,
+                    sb.StatBonuses
+                FROM Characters c
+                CROSS APPLY LevelStatsCTE ls
+                CROSS APPLY TagsCTE t
+                CROSS APPLY SkillsCTE s
+                CROSS APPLY StatBonusCTE sb
+                WHERE c.CharacterID = @Id`,
+                [{ name: 'Id', type: sql.Int, value: parseInt(id) }],
+                cacheKey
+            );
+
+            if (!result.recordset.length) {
+                return res.status(404).json({ error: 'Character not found' });
+            }
+
+            const character = result.recordset[0];
+            const jsonFields = ['LevelStats', 'CharacterTags', 'CharacterSkills', 'StatBonuses'];
+            
+            jsonFields.forEach(field => {
+                try {
+                    character[field] = JSON.parse(character[field] || '[]');
+                    if (field === 'CharacterSkills') {
+                        character[field] = character[field].map(skill => ({
+                            ...skill,
+                            SkillMaterials: JSON.parse(skill.SkillMaterials || '[]')
+                        }));
+                    }
+                } catch (error) {
+                    console.error(`Error parsing ${field}:`, error);
+                    character[field] = [];
+                }
+            });
+
+            res.json({ success: true, data: character });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     },
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000
-    }
-});
-const poolConnect = pool.connect();
 
-// Connect to the database
-pool.connect(err => {
-    if (err) {
-        console.error('Database connection failed:', err);
-    } else {
-        console.log('Successfully connected to WutheringWavesDB5 on MUDDY server');
-    }
-});
+    async getAll(req, res) {
+        try {
+            const result = await executeQuery(
+                `SELECT 
+                    c.CharacterID,
+                    c.CharacterName,
+                    c.Attribute,
+                    c.WeaponType,
+                    c.Rarity
+                FROM Characters c
+                ORDER BY c.CharacterID`,
+                [],
+                'all_characters'
+            );
 
-// Enhanced error handling middleware
+            res.json({
+                success: true,
+                data: result.recordset
+            });
+        } catch (error) {
+            res.status(500).json({ 
+                success: false,
+                error: error.message 
+            });
+        }
+    }
+};
+
+// Material routes
+const materialRoutes = {
+    async getAll(req, res) {
+        try {
+            const result = await executeQuery(
+                `SELECT 
+                    MaterialID,
+                    MaterialName,
+                    MaterialType,
+                    ValueNumber,
+                    Rarity
+                FROM Materials
+                ORDER BY MaterialType, Rarity DESC, MaterialName`,
+                [],
+                'all_materials'
+            );
+
+            res.json({ success: true, data: result.recordset });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+};
+
+// Milestone routes
+const milestoneRoutes = {
+    async getAll(req, res) {
+        try {
+            const result = await executeQuery(
+                `SELECT 
+                    ml.RankID,
+                    ml.EXP_Required,
+                    rl.LevelMin,
+                    rl.LevelMax
+                FROM Milestone_Levels ml
+                JOIN Rank_Levels rl ON ml.RankID = rl.RankID
+                ORDER BY ml.RankID ASC`,
+                [],
+                'all_milestones'
+            );
+
+            res.json({ success: true, data: result.recordset });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+};
+
+// Route setup
+app.get('/api/characters/:id', characterRoutes.getById);
+app.get('/api/characters', characterRoutes.getAll);
+app.get('/api/materials', materialRoutes.getAll);
+app.get('/api/milestone_levels', milestoneRoutes.getAll);
+
+// Global error handler
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
+    console.error('Unhandled error:', err);
     res.status(err.status || 500).json({
         success: false,
-        error: err.message || 'Internal Server Error'
+        error: process.env.NODE_ENV === 'production' 
+            ? 'Internal server error'
+            : err.message
     });
 });
 
-// Optimized query execution with caching
-async function executeQuery(query, params = [], cacheKey = null) {
-    if (cacheKey && cache.has(cacheKey)) {
-        const cached = cache.get(cacheKey);
-        if (Date.now() - cached.timestamp < CACHE_DURATION) {
-            return cached.data;
-        }
-        cache.delete(cacheKey);
+// Graceful shutdown
+async function shutdown(signal) {
+    console.log(`Received ${signal}. Starting graceful shutdown...`);
+    
+    try {
+        await pool.close();
+        console.log('Database pool closed');
+        
+        process.exit(0);
+    } catch (error) {
+        console.error('Error during shutdown:', error);
+        process.exit(1);
     }
-
-    await poolConnect;
-    const request = pool.request();
-    params.forEach(param => request.input(param.name, param.type, param.value));
-    
-    const result = await request.query(query);
-    
-    if (cacheKey) {
-        cache.set(cacheKey, {
-            timestamp: Date.now(),
-            data: result
-        });
-    }
-    
-    return result;
 }
 
-// Get character details by ID with ALL related data
-app.get('/api/characters/:id', async (req, res, next) => {
-    try {
-        const cacheKey = `character_${req.params.id}`;
-        const result = await executeQuery(`
-            WITH LevelStatsCTE AS (
-                SELECT 
-                    JSON_QUERY((
-                        SELECT cls.Level, cls.RankID, cls.HP, cls.ATK, cls.DEF,
-                            ISNULL(cls.ER, 100.00) as EnergyRecharge,
-                            ISNULL(cls.CritRate, 5.00) as CritRate,
-                            ISNULL(cls.CritDamage, 150.00) as CritDamage,
-                            rl.LevelMin, rl.LevelMax, ml.EXP_Required
-                        FROM Character_Level_Stats cls
-                        JOIN Rank_Levels rl ON cls.RankID = rl.RankID
-                        LEFT JOIN Milestone_Levels ml ON ml.RankID = cls.RankID
-                        WHERE cls.CharacterID = @Id
-                        FOR JSON PATH
-                    )) as LevelStats
-            ),
-            TagsCTE AS (
-                SELECT 
-                    JSON_QUERY((
-                        SELECT t.TagName
-                        FROM Character_Tags ct
-                        JOIN Tags t ON ct.TagID = t.TagID
-                        WHERE ct.CharacterID = @Id
-                        FOR JSON PATH
-                    )) as CharacterTags
-            ),
-            SkillsCTE AS (
-                SELECT 
-                    JSON_QUERY((
-                        SELECT s.SkillID, s.SkillName, s.SkillType, s.SkillDescription,
-                            (
-                                SELECT slm.Level, m.MaterialID, m.MaterialName,
-                                    m.MaterialType, m.Rarity as MaterialRarity,
-                                    m.ValueNumber, slm.Quantity
-                                FROM Skill_Level_Materials slm
-                                JOIN Materials m ON slm.MaterialID = m.MaterialID
-                                WHERE slm.SkillID = s.SkillID
-                                FOR JSON PATH
-                            ) as SkillMaterials
-                        FROM Skills s
-                        WHERE s.CharacterID = @Id
-                        FOR JSON PATH
-                    )) as CharacterSkills
-            ),
-            StatBonusCTE AS (
-                SELECT 
-                    JSON_QUERY((
-                        SELECT csb.CharacterStatBonusID,
-                            sbt1.StatBonusName as Bonus1Name,
-                            sbt1.Milestone1_Percentage as Bonus1_M1_Percentage,
-                            sbt1.Milestone2_Percentage as Bonus1_M2_Percentage,
-                            sbt2.StatBonusName as Bonus2Name,
-                            sbt2.Milestone1_Percentage as Bonus2_M1_Percentage,
-                            sbt2.Milestone2_Percentage as Bonus2_M2_Percentage
-                        FROM Character_Stat_Bonus csb
-                        JOIN Stat_Bonus_Types sbt1 ON csb.Bonus1ID = sbt1.StatBonusID
-                        JOIN Stat_Bonus_Types sbt2 ON csb.Bonus2ID = sbt2.StatBonusID
-                        WHERE csb.CharacterID = @Id
-                        FOR JSON PATH
-                    )) as StatBonuses
-            )
-            SELECT 
-                c.CharacterID,
-                c.CharacterName,
-                c.Attribute,
-                c.WeaponType,
-                c.Rarity,
-                ls.LevelStats,
-                t.CharacterTags,
-                s.CharacterSkills,
-                sb.StatBonuses
-            FROM Characters c
-            CROSS APPLY LevelStatsCTE ls
-            CROSS APPLY TagsCTE t
-            CROSS APPLY SkillsCTE s
-            CROSS APPLY StatBonusCTE sb
-            WHERE c.CharacterID = @Id`,
-            [{ name: 'Id', type: sql.Int, value: parseInt(req.params.id) }],
-            cacheKey
-        );
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
-        if (result.recordset.length === 0) {
-            return res.status(404).json({ error: 'Character not found' });
-        }
-
-        // Process each JSON string field
-        const character = result.recordset[0];
-        
-        try {
-            character.LevelStats = JSON.parse(character.LevelStats || '[]');
-            character.CharacterTags = JSON.parse(character.CharacterTags || '[]');
-            character.CharacterSkills = JSON.parse(character.CharacterSkills || '[]');
-            character.StatBonuses = JSON.parse(character.StatBonuses || '[]');
-
-            // Process skill materials for each skill
-            character.CharacterSkills = character.CharacterSkills.map(skill => ({
-                ...skill,
-                SkillMaterials: JSON.parse(skill.SkillMaterials || '[]')
-            }));
-        } catch (parseError) {
-            console.error('Error parsing JSON fields:', parseError);
-            return res.status(500).json({ error: 'Error processing character data' });
-        }
-
-        res.json({
-            success: true,
-            data: character
-        });
-
-    } catch (err) {
-        console.error('Error fetching character details:', err);
-        res.status(500).json({ error: err.message });
-    }
+// Start server
+app.listen(CONFIG.PORT, () => {
+    console.log(`Server running on port ${CONFIG.PORT}`);
+    console.log(`Connected to ${CONFIG.DB.database} on ${CONFIG.DB.server}`);
 });
-
-// Get all characters with their base details
-app.get('/api/characters', async (req, res) => {
-    try {
-        const result = await executeQuery(`
-            SELECT 
-                c.CharacterID,
-                c.CharacterName,
-                c.Attribute,
-                c.WeaponType,
-                c.Rarity
-            FROM Characters c
-            ORDER BY c.CharacterID
-        `);
-
-        if (!result.recordset) {
-            throw new Error('No data returned from database');
-        }
-
-        res.json({
-            success: true,
-            data: result.recordset
-        });
-    } catch (err) {
-        console.error('Error fetching all characters:', err);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to fetch characters',
-            details: err.message 
-        });
-    }
-});
-
-// Get all milestone levels and required EXP
-app.get('/api/milestone_levels', async (req, res) => {
-    try {
-        const result = await executeQuery(`
-            SELECT 
-                ml.RankID,
-                ml.EXP_Required,
-                rl.LevelMin,
-                rl.LevelMax
-            FROM Milestone_Levels ml
-            JOIN Rank_Levels rl ON ml.RankID = rl.RankID
-            ORDER BY ml.RankID ASC
-        `);
-        res.json({ data: result.recordset });
-    } catch (err) {
-        console.error('Error fetching milestone levels:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-
-// Add new endpoint for materials
-app.get('/api/materials', async (req, res) => {
-    try {
-        const result = await executeQuery(`
-            SELECT 
-                MaterialID,
-                MaterialName,
-                MaterialType,
-                ValueNumber,
-                Rarity
-            FROM Materials
-            ORDER BY MaterialType, Rarity DESC, MaterialName
-        `);
-        res.json({ data: result.recordset });
-    } catch (err) {
-        console.error('Error fetching materials:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Graceful shutdown handling
-process.on('SIGTERM', async () => {
-    console.log('Received SIGTERM. Closing HTTP server and DB pool...');
-    await pool.close();
-    process.exit(0);
-});
-
-// Start the server
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 module.exports = app;
