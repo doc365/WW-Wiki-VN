@@ -1,4 +1,4 @@
-// ImageIcon
+// ImageIcon imports
 import Yangyang from '../../assets/Character/CharactersIcon/1.png'
 import Chixia from '../../assets/Character/CharactersIcon/2.png'
 import Baizhi from '../../assets/Character/CharactersIcon/3.png'
@@ -27,7 +27,8 @@ import Carlotta from '../../assets/Character/CharactersIcon/25.png'
 import Roccia from '../../assets/Character/CharactersIcon/26.png'
 import Phoebe from '../../assets/Character/CharactersIcon/27.png'
 import Brant from '../../assets/Character/CharactersIcon/28.png'
-// portraits
+
+// Portrait imports
 import PhoebePt from '../../assets/Character/CharacterPortrait/PhoebePt.png'
 import BaizhiPt from '../../assets/Character/CharacterPortrait/BaizhiPt.png'
 import CamellyaPt from '../../assets/Character/CharacterPortrait/CamellyaPt.png'
@@ -57,35 +58,36 @@ import SKPt from '../../assets/Character/CharacterPortrait/SKPt.png'
 import RocciaPt from '../../assets/Character/CharacterPortrait/RocciaPt.png'
 import BrantPt from '../../assets/Character/CharacterPortrait/BrantPt.png'
 
+// Simplified data structure with just image mappings
 const CharactersData = [
-    { id: 1, name: "Yangyang", image: Yangyang, portrait: YangyangPt, attribute: "Aero", rarity: 4, weapon_type: "Sword" },
-    { id: 2, name: "Chixia", image: Chixia, portrait: ChixiaPt, attribute: "Fusion", rarity: 4, weapon_type: "Pistols" },
-    { id: 3, name: "Baizhi", image: Baizhi, portrait: BaizhiPt, attribute: "Glacio", rarity: 4, weapon_type: "Rectifier" },
-    { id: 4, name: "Sanhua", image: Sanhua, portrait: SanhuaPt, attribute: "Glacio", rarity: 4, weapon_type: "Sword" },
-    { id: 5, name: "Aalto", image: Aalto, portrait: AaltoPt, attribute: "Aero", rarity: 4, weapon_type: "Pistols" },
-    { id: 6, name: "Encore", image: Encore, portrait: EncorePt, attribute: "Fusion", rarity: 5, weapon_type: "Rectifier" },
-    { id: 7, name: "Jiaxin", image: Jiaxin, portrait: JiaxinPt, attribute: "Aero", rarity: 5, weapon_type: "Gauntlet" },
-    { id: 8, name: "Jiyan", image: Jiyan, portrait: JiyanPt, attribute: "Aero", rarity: 5, weapon_type: "Broadblade" },
-    { id: 9, name: "Mortefi", image: Mortefi, portrait: MortefiPt, attribute: "Fusion", rarity: 4, weapon_type: "Pistols" },
-    { id: 10, name: "Yuanwu", image: Yuanwu, portrait: YuanwuPt, attribute: "Electro", rarity: 4, weapon_type: "Gauntlet" },
-    { id: 11, name: "Verina", image: Verina, portrait: VerinaPt, attribute: "Spectro", rarity: 5, weapon_type: "Rectifier" },
-    { id: 12, name: "Taoqi", image: Taoqi, portrait: TaoqiPt, attribute: "Havoc", rarity: 4, weapon_type: "Broadblade" },
-    { id: 13, name: "Lingyang", image: Lingyang, portrait: LingyangPt, attribute: "Glacio", rarity: 5, weapon_type: "Gauntlet" },
-    { id: 14, name: "Calcharo", image: Calcharo, portrait: CalcharoPt, attribute: "Electro", rarity: 5, weapon_type: "Broadblade" },
-    { id: 15, name: "Danjin", image: Danjin, portrait: DanjinPt, attribute: "Havoc", rarity: 4, weapon_type: "Sword" },
-    { id: 16, name: "Yinlin", image: Yinlin, portrait: YinlinPt, attribute: "Electro", rarity: 5, weapon_type: "Rectifier" },
-    { id: 17, name: "Jinhsi", image: Jinhsi, portrait: JinhsiPt, attribute: "Spectro", rarity: 5, weapon_type: "Broadblade" },
-    { id: 18, name: "Changli", image: Changli, portrait: ChangliPt, attribute: "Fusion", rarity: 5, weapon_type: "Sword" },
-    { id: 19, name: "Youhu", image: Youhu, portrait: YouhuPt, attribute: "Glacio", rarity: 4, weapon_type: "Gauntlet" },
-    { id: 20, name: "Lumi", image: Lumi, portrait: LumiPt, attribute: "Electro", rarity: 4, weapon_type: "Broadblade" },
-    { id: 21, name: "Zhezhi", image: Zhezhi, portrait: ZhezhiPt, attribute: "Glacio", rarity: 5, weapon_type: "Rectifier" },
-    { id: 22, name: "Xiangli Yao", image: XY, portrait: XYPt, attribute: "Electro", rarity: 5, weapon_type: "Gauntlet" },
-    { id: 23, name: "Shorekeeper", image: SK, portrait: SKPt, attribute: "Spectro", rarity: 5, weapon_type: "Rectifier" },
-    { id: 24, name: "Camellya", image: Camellya, portrait: CamellyaPt, attribute: "Havoc", rarity: 5, weapon_type: "Sword" },
-    { id: 25, name: "Carlotta", image: Carlotta, portrait: CarlottaPt, attribute: "Glacio", rarity: 5, weapon_type: "Pistols" },
-    { id: 26, name: "Roccia", image: Roccia, portrait: RocciaPt, attribute: "Havoc", rarity: 5, weapon_type: "Gauntlet" },
-    { id: 27, name: "Phoebe", image: Phoebe, portrait: PhoebePt, attribute: "Spectro", rarity: 5, weapon_type: "Rectifier" },
-    { id: 28, name: "Brant", image: Brant, portrait: BrantPt, attribute: "Fusion", rarity: 5, weapon_type: "Sword" },
+    { name: "Yangyang", image: Yangyang, portrait: YangyangPt },
+    { name: "Chixia", image: Chixia, portrait: ChixiaPt },
+    { name: "Baizhi", image: Baizhi, portrait: BaizhiPt },
+    { name: "Sanhua", image: Sanhua, portrait: SanhuaPt },
+    { name: "Aalto", image: Aalto, portrait: AaltoPt },
+    { name: "Encore", image: Encore, portrait: EncorePt },
+    { name: "Jiaxin", image: Jiaxin, portrait: JiaxinPt },
+    { name: "Jiyan", image: Jiyan, portrait: JiyanPt },
+    { name: "Mortefi", image: Mortefi, portrait: MortefiPt },
+    { name: "Yuanwu", image: Yuanwu, portrait: YuanwuPt },
+    { name: "Verina", image: Verina, portrait: VerinaPt },
+    { name: "Taoqi", image: Taoqi, portrait: TaoqiPt },
+    { name: "Lingyang", image: Lingyang, portrait: LingyangPt },
+    { name: "Calcharo", image: Calcharo, portrait: CalcharoPt },
+    { name: "Danjin", image: Danjin, portrait: DanjinPt },
+    { name: "Yinlin", image: Yinlin, portrait: YinlinPt },
+    { name: "Jinhsi", image: Jinhsi, portrait: JinhsiPt },
+    { name: "Changli", image: Changli, portrait: ChangliPt },
+    { name: "Youhu", image: Youhu, portrait: YouhuPt },
+    { name: "Lumi", image: Lumi, portrait: LumiPt },
+    { name: "Zhezhi", image: Zhezhi, portrait: ZhezhiPt },
+    { name: "Xiangli Yao", image: XY, portrait: XYPt },
+    { name: "Shorekeeper", image: SK, portrait: SKPt },
+    { name: "Camellya", image: Camellya, portrait: CamellyaPt },
+    { name: "Carlotta", image: Carlotta, portrait: CarlottaPt },
+    { name: "Roccia", image: Roccia, portrait: RocciaPt },
+    { name: "Phoebe", image: Phoebe, portrait: PhoebePt },
+    { name: "Brant", image: Brant, portrait: BrantPt }
 ];
 
 export default CharactersData;

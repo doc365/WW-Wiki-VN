@@ -57,12 +57,18 @@ app.get('/api/characters/:id', async (req, res) => {
                 c.WeaponType,
                 c.Rarity,
                 (
-                    SELECT cls.Level, cls.RankID,
-                           cls.HP, cls.ATK, cls.DEF,
-                           cls.ER as EnergyRecharge,
-                           cls.CritRate, cls.CritDamage,
-                           rl.LevelMin, rl.LevelMax,
-                           ml.EXP_Required
+                    SELECT 
+                        cls.Level, 
+                        cls.RankID,
+                        cls.HP, 
+                        cls.ATK, 
+                        cls.DEF,
+                        ISNULL(cls.ER, 100.00) as EnergyRecharge,
+                        ISNULL(cls.CritRate, 5.00) as CritRate,
+                        ISNULL(cls.CritDamage, 150.00) as CritDamage,
+                        rl.LevelMin,
+                        rl.LevelMax,
+                        ml.EXP_Required
                     FROM Character_Level_Stats cls
                     JOIN Rank_Levels rl ON cls.RankID = rl.RankID
                     LEFT JOIN Milestone_Levels ml ON ml.RankID = cls.RankID
@@ -149,22 +155,31 @@ app.get('/api/characters/:id', async (req, res) => {
 app.get('/api/characters', async (req, res) => {
     try {
         const result = await executeQuery(`
-            SELECT DISTINCT
+            SELECT 
                 c.CharacterID,
                 c.CharacterName,
                 c.Attribute,
                 c.WeaponType,
-                c.Rarity,
-                STRING_AGG(t.TagName, ', ') WITHIN GROUP (ORDER BY t.TagName) as Tags
+                c.Rarity
             FROM Characters c
-            LEFT JOIN Character_Tags ct ON c.CharacterID = ct.CharacterID
-            LEFT JOIN Tags t ON ct.TagID = t.TagID
-            GROUP BY c.CharacterID, c.CharacterName, c.Attribute, c.WeaponType, c.Rarity
+            ORDER BY c.CharacterID
         `);
-        res.json({ data: result.recordset });
+
+        if (!result.recordset) {
+            throw new Error('No data returned from database');
+        }
+
+        res.json({
+            success: true,
+            data: result.recordset
+        });
     } catch (err) {
         console.error('Error fetching all characters:', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to fetch characters',
+            details: err.message 
+        });
     }
 });
 
