@@ -83,70 +83,82 @@ async function executeQuery(query, params = [], cacheKey = null) {
 app.get('/api/characters/:id', async (req, res, next) => {
     try {
         const cacheKey = `character_${req.params.id}`;
-        const result = await executeQuery(
-            `SELECT 
+        const result = await executeQuery(`
+            WITH LevelStatsCTE AS (
+                SELECT 
+                    JSON_QUERY((
+                        SELECT cls.Level, cls.RankID, cls.HP, cls.ATK, cls.DEF,
+                            ISNULL(cls.ER, 100.00) as EnergyRecharge,
+                            ISNULL(cls.CritRate, 5.00) as CritRate,
+                            ISNULL(cls.CritDamage, 150.00) as CritDamage,
+                            rl.LevelMin, rl.LevelMax, ml.EXP_Required
+                        FROM Character_Level_Stats cls
+                        JOIN Rank_Levels rl ON cls.RankID = rl.RankID
+                        LEFT JOIN Milestone_Levels ml ON ml.RankID = cls.RankID
+                        WHERE cls.CharacterID = @Id
+                        FOR JSON PATH
+                    )) as LevelStats
+            ),
+            TagsCTE AS (
+                SELECT 
+                    JSON_QUERY((
+                        SELECT t.TagName
+                        FROM Character_Tags ct
+                        JOIN Tags t ON ct.TagID = t.TagID
+                        WHERE ct.CharacterID = @Id
+                        FOR JSON PATH
+                    )) as CharacterTags
+            ),
+            SkillsCTE AS (
+                SELECT 
+                    JSON_QUERY((
+                        SELECT s.SkillID, s.SkillName, s.SkillType, s.SkillDescription,
+                            (
+                                SELECT slm.Level, m.MaterialID, m.MaterialName,
+                                    m.MaterialType, m.Rarity as MaterialRarity,
+                                    m.ValueNumber, slm.Quantity
+                                FROM Skill_Level_Materials slm
+                                JOIN Materials m ON slm.MaterialID = m.MaterialID
+                                WHERE slm.SkillID = s.SkillID
+                                FOR JSON PATH
+                            ) as SkillMaterials
+                        FROM Skills s
+                        WHERE s.CharacterID = @Id
+                        FOR JSON PATH
+                    )) as CharacterSkills
+            ),
+            StatBonusCTE AS (
+                SELECT 
+                    JSON_QUERY((
+                        SELECT csb.CharacterStatBonusID,
+                            sbt1.StatBonusName as Bonus1Name,
+                            sbt1.Milestone1_Percentage as Bonus1_M1_Percentage,
+                            sbt1.Milestone2_Percentage as Bonus1_M2_Percentage,
+                            sbt2.StatBonusName as Bonus2Name,
+                            sbt2.Milestone1_Percentage as Bonus2_M1_Percentage,
+                            sbt2.Milestone2_Percentage as Bonus2_M2_Percentage
+                        FROM Character_Stat_Bonus csb
+                        JOIN Stat_Bonus_Types sbt1 ON csb.Bonus1ID = sbt1.StatBonusID
+                        JOIN Stat_Bonus_Types sbt2 ON csb.Bonus2ID = sbt2.StatBonusID
+                        WHERE csb.CharacterID = @Id
+                        FOR JSON PATH
+                    )) as StatBonuses
+            )
+            SELECT 
                 c.CharacterID,
                 c.CharacterName,
                 c.Attribute,
                 c.WeaponType,
                 c.Rarity,
-                (
-                    SELECT 
-                        cls.Level, 
-                        cls.RankID,
-                        cls.HP, 
-                        cls.ATK, 
-                        cls.DEF,
-                        ISNULL(cls.ER, 100.00) as EnergyRecharge,
-                        ISNULL(cls.CritRate, 5.00) as CritRate,
-                        ISNULL(cls.CritDamage, 150.00) as CritDamage,
-                        rl.LevelMin,
-                        rl.LevelMax,
-                        ml.EXP_Required
-                    FROM Character_Level_Stats cls
-                    JOIN Rank_Levels rl ON cls.RankID = rl.RankID
-                    LEFT JOIN Milestone_Levels ml ON ml.RankID = cls.RankID
-                    WHERE cls.CharacterID = c.CharacterID
-                    FOR JSON PATH
-                ) as LevelStats,
-                (
-                    SELECT t.TagID, t.TagName, t.TagDescription
-                    FROM Character_Tags ct
-                    JOIN Tags t ON ct.TagID = t.TagID
-                    WHERE ct.CharacterID = c.CharacterID
-                    FOR JSON PATH
-                ) as CharacterTags,
-                (
-                    SELECT s.SkillID, s.SkillName, s.SkillType, s.SkillDescription,
-                           (
-                               SELECT slm.Level as SkillLevel,
-                                      m.MaterialID, m.MaterialName, 
-                                      m.MaterialType, m.Rarity as MaterialRarity,
-                                      m.ValueNumber, slm.Quantity
-                               FROM Skill_Level_Materials slm
-                               JOIN Materials m ON slm.MaterialID = m.MaterialID
-                               WHERE slm.SkillID = s.SkillID
-                               FOR JSON PATH
-                           ) as SkillMaterials
-                    FROM Skills s
-                    WHERE s.CharacterID = c.CharacterID
-                    FOR JSON PATH
-                ) as CharacterSkills,
-                (
-                    SELECT csb.CharacterStatBonusID,
-                           sbt1.StatBonusName as Bonus1Name,
-                           sbt1.Milestone1_Percentage as Bonus1_M1_Percentage,
-                           sbt1.Milestone2_Percentage as Bonus1_M2_Percentage,
-                           sbt2.StatBonusName as Bonus2Name,
-                           sbt2.Milestone1_Percentage as Bonus2_M1_Percentage,
-                           sbt2.Milestone2_Percentage as Bonus2_M2_Percentage
-                    FROM Character_Stat_Bonus csb
-                    JOIN Stat_Bonus_Types sbt1 ON csb.Bonus1ID = sbt1.StatBonusID
-                    JOIN Stat_Bonus_Types sbt2 ON csb.Bonus2ID = sbt2.StatBonusID
-                    WHERE csb.CharacterID = c.CharacterID
-                    FOR JSON PATH
-                ) as StatBonuses
+                ls.LevelStats,
+                t.CharacterTags,
+                s.CharacterSkills,
+                sb.StatBonuses
             FROM Characters c
+            CROSS APPLY LevelStatsCTE ls
+            CROSS APPLY TagsCTE t
+            CROSS APPLY SkillsCTE s
+            CROSS APPLY StatBonusCTE sb
             WHERE c.CharacterID = @Id`,
             [{ name: 'Id', type: sql.Int, value: parseInt(req.params.id) }],
             cacheKey
