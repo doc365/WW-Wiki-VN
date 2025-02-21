@@ -4,6 +4,67 @@ import { fetchCharacterById } from '../axios';
 import charactersData from '../data/CharactersData';
 import icondata from '../data/IconData';
 
+const CharacterDetail = () => {
+    const { id } = useParams();
+    const [character, setCharacter] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedSkill, setSelectedSkill] = useState('basic-attack');
+
+    useEffect(() => {
+        const getCharacter = async () => {
+            try {
+                const data = await fetchCharacterById(id);
+                
+                if (!data) {
+                    throw new Error('No character data received');
+                }
+
+                // Find matching local character data by id
+                const localCharacter = charactersData.find(
+                    char => char.id === parseInt(id)
+                );
+
+                setCharacter({
+                    ...data,
+                    image: localCharacter?.image || null,
+                    portrait: localCharacter?.portrait || null
+                });
+            } catch (err) {
+                console.error('Error fetching character:', err);
+                setError(err.message || 'Failed to load character data');
+            } finally {
+                setLoading(false);
+            }
+        };
+        getCharacter();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-white text-xl">Loading...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-red-500 text-xl">Error: {error}</div>
+            </div>
+        );
+    }
+
+    if (!character) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="text-white text-xl">Character not found</div>
+            </div>
+        );
+    }
+
+
 // Update StatRow component to have larger icon
 const StatRow = memo(({ label, value, icon }) => (
     <div className="flex justify-between items-center p-3 bg-gray-900 border-b border-gray-800">
@@ -140,54 +201,6 @@ const SkillContent = memo(({ skillType, skills = [] }) => {
     );
 });
 
-const CharacterDetail = () => {
-    const { id } = useParams();
-    const [character, setCharacter] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [selectedSkill, setSelectedSkill] = useState('basic-attack');
-
-    useEffect(() => {
-        const getCharacter = async () => {
-            try {
-                const localCharacter = charactersData.find(char => char.id === parseInt(id));
-                if (localCharacter) {
-                    setCharacter(prevState => ({ ...prevState, ...localCharacter }));
-                }
-                const data = await fetchCharacterById(id);
-                setCharacter(prevState => ({ ...prevState, ...data }));
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        getCharacter();
-    }, [id]);
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-white text-xl">Loading...</div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-red-500 text-xl">Error: {error}</div>
-            </div>
-        );
-    }
-
-    if (!character) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="text-white text-xl">Character not found</div>
-            </div>
-        );
-    }
 
     const SKILL_TYPES = [
         'basic-attack',
