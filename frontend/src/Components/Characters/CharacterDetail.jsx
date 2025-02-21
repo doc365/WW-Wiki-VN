@@ -102,44 +102,55 @@ const CharacterPortrait = memo(({ character }) => (
     </div>
 ));
 
-const StatsPanel = memo(({ character }) => (
-    <div className="w-1/2">
-        <div className="bg-gray-950 rounded-lg overflow-hidden">
-            <div className="p-4">
-                <h2 className="text-2xl font-bold">Ascension Stats</h2>
-                <div className="text-blue-500 mb-4">CHARACTER STATS</div>
-                
-                <div className="divide-y divide-gray-700 bg-gray-950 rounded-lg">
-                    {Object.entries({
-                        Level: "90",
-                        "Base HP": character.HP,
-                        "Base ATK": character.ATK,
-                        "Base DEF": character.DEF,
-                        "ER": `${character.ER}%`,
-                        "Crit Rate": `${character.CR}%`,
-                        "Crit DMG": `${character.CD}%`,
-                        "Weapon Type": character.Weapon_type,
-                        "Signature Weapon": character.SigWea,
-                        "Description": character.Description,
-                        "Attribute": character.Attribute
-                    }).map(([label, value]) => (
-                        <StatRow 
-                            key={label} 
-                            label={label} 
-                            value={value}
-                            icon={label === "Attribute" ? icondata[value] : null}
-                        />
-                    ))}
+const StatsPanel = memo(({ character }) => {
+    const levelStats = character.LevelStats?.[0] || {};
+    
+    // Default values for stats
+    const defaultStats = {
+        EnergyRecharge: 100,
+        CritRate: 5,
+        CritDamage: 150
+    };
+
+    return (
+        <div className="w-1/2">
+            <div className="bg-gray-950 rounded-lg overflow-hidden">
+                <div className="p-4">
+                    <h2 className="text-2xl font-bold">Ascension Stats</h2>
+                    <div className="text-blue-500 mb-4">CHARACTER STATS</div>
+                    
+                    <div className="divide-y divide-gray-700 bg-gray-950 rounded-lg">
+                        {Object.entries({
+                            "Level Range": `${levelStats.LevelMin || 1} - ${levelStats.LevelMax || 90}`,
+                            "Current Level": levelStats.Level || "1",
+                            "Rank": levelStats.RankID || "0",
+                            "Base HP": levelStats.HP || "0",
+                            "Base ATK": levelStats.ATK || "0",
+                            "Base DEF": levelStats.DEF || "0",
+                            "Energy Recharge": `${levelStats.EnergyRecharge ?? defaultStats.EnergyRecharge}%`,
+                            "Critical Rate": `${levelStats.CritRate ?? defaultStats.CritRate}%`,
+                            "Critical DMG": `${levelStats.CritDamage ?? defaultStats.CritDamage}%`,
+                            "EXP Required": levelStats.EXP_Required || "0",
+                            "Weapon Type": character.WeaponType,
+                        }).map(([label, value]) => (
+                            <StatRow 
+                                key={label} 
+                                label={label} 
+                                value={value}
+                                icon={label === "Element" ? icondata[value] : null}
+                            />
+                        ))}
+                    </div>
+                </div>
+                <div className="p-4">
+                    <button className="w-full p-3 text-center border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
+                        {character.CharacterTags?.[0]?.CharacterTags || "No Tag"}
+                    </button>
                 </div>
             </div>
-            <div className="p-4">
-                <button className="w-full p-3 text-center border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
-                    {character.Tag}
-                </button>
-            </div>
         </div>
-    </div>
-));
+    );
+});
 
 const MaterialsSection = memo(({ title, materials = [] }) => (
     <div className="w-1/2 p-4 bg-gray-800 rounded-lg">
