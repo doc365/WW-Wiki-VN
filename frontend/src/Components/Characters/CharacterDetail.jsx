@@ -1,8 +1,235 @@
 import React, { useEffect, useState, memo } from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { fetchCharacterById } from '../axios';
 import charactersData from '../data/CharactersData';
 import icondata from '../data/IconData';
+
+const StatRow = memo(({ label, value, icon }) => (
+    <div className="flex justify-between items-center p-3 bg-gray-900 border-b border-gray-800">
+        <span className="text-gray-300">{label}</span>
+        <div className="flex items-center gap-2">
+            <span className="text-white">{value}</span>
+            {icon && <img src={icon} alt={value} className="w-8 h-8" />}
+        </div>
+    </div>
+));
+StatRow.displayName = 'StatRow';
+StatRow.propTypes = {
+    label: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    icon: PropTypes.string
+};
+
+const CharacterPortrait = memo(({ character }) => (
+    <div className="w-1/2 relative">
+        <img 
+            src={character.portrait} 
+            alt={character.name} 
+            className="w-full h-auto rounded-md"
+        />
+        <div className="absolute bottom-0 right-0 bg-gray-800/70 backdrop-blur-md p-4 rounded-lg">
+            <p className="text-2xl font-semibold">{character.name}</p>
+            <div className="flex items-center gap-2">
+                <p className="text-lg">{character.Attribute}</p>
+                <img 
+                    src={icondata[character.Attribute]} 
+                    alt={character.Attribute}
+                    className="w-8 h-8"
+                />
+            </div>
+            <div className="flex justify-center gap-1 mt-2">
+                {[...Array(character.Rarity)].map((_, index) => (
+                    <span key={index} className="text-yellow-400 text-xl">★</span>
+                ))}
+            </div>
+        </div>
+    </div>
+));
+CharacterPortrait.displayName = 'CharacterPortrait';
+CharacterPortrait.propTypes = {
+    character: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        portrait: PropTypes.string,
+        Attribute: PropTypes.string,
+        Rarity: PropTypes.number
+    }).isRequired
+};
+
+const StatsPanel = memo(({ character }) => {
+    const levelStats = character.LevelStats?.[0] || {};
+    
+    // Default values for stats
+    const defaultStats = {
+        EnergyRecharge: 100,
+        CritRate: 5,
+        CritDamage: 150
+    };
+
+    return (
+        <div className="w-1/2">
+            <div className="bg-gray-950 rounded-lg overflow-hidden">
+                <div className="p-4">
+                    <h2 className="text-2xl font-bold">Ascension Stats</h2>
+                    <div className="text-blue-500 mb-4">CHARACTER STATS</div>
+                    
+                    <div className="divide-y divide-gray-700 bg-gray-950 rounded-lg">
+                        {Object.entries({
+                            "Level Range": `${levelStats.LevelMin || 1} - ${levelStats.LevelMax || 90}`,
+                            "Current Level": levelStats.Level || "1",
+                            "Rank": levelStats.RankID || "0",
+                            "Base HP": levelStats.HP || "0",
+                            "Base ATK": levelStats.ATK || "0",
+                            "Base DEF": levelStats.DEF || "0",
+                            "Energy Recharge": `${levelStats.EnergyRecharge ?? defaultStats.EnergyRecharge}%`,
+                            "Critical Rate": `${levelStats.CritRate ?? defaultStats.CritRate}%`,
+                            "Critical DMG": `${levelStats.CritDamage ?? defaultStats.CritDamage}%`,
+                            "EXP Required": levelStats.EXP_Required || "0",
+                            "Weapon Type": character.WeaponType,
+                        }).map(([label, value]) => (
+                            <StatRow 
+                                key={label} 
+                                label={label} 
+                                value={value}
+                                icon={label === "Element" ? icondata[value] : null}
+                            />
+                        ))}
+                    </div>
+                </div>
+                <div className="p-4">
+                    <button className="w-full p-3 text-center border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
+                        {character.CharacterTags?.[0]?.CharacterTags || "No Tag"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+});
+StatsPanel.displayName = 'StatsPanel';
+StatsPanel.propTypes = {
+    character: PropTypes.shape({
+        LevelStats: PropTypes.arrayOf(PropTypes.object),
+        WeaponType: PropTypes.string,
+        CharacterTags: PropTypes.arrayOf(PropTypes.shape({
+            CharacterTags: PropTypes.string
+        }))
+    }).isRequired
+};
+
+const MaterialsSection = memo(({ title, materials }) => (
+    <div className="w-1/2 p-4 bg-gray-800 rounded-lg">
+        <h2 className="text-xl font-semibold mb-2 text-blue-500">{title}</h2>
+        <div className="grid grid-cols-4 gap-4">
+            {materials.map((material, index) => (
+                <div key={index} className="flex items-center gap-2">
+                    <img src={material.image} alt={material.name} className="w-8 h-8" />
+                    <span className="text-white">{material.name}</span>
+                </div>
+            ))}
+        </div>
+    </div>
+));
+MaterialsSection.displayName = 'MaterialsSection';
+MaterialsSection.propTypes = {
+    title: PropTypes.string.isRequired,
+    materials: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        image: PropTypes.string.isRequired
+    }))
+};
+MaterialsSection.defaultProps = {
+    materials: []
+};
+
+const SkillTab = memo(({ skill, isActive, onClick }) => (
+    <button 
+        onClick={onClick}
+        className={`p-2 text-blue-500 font-bold hover:bg-gray-700 rounded-lg transition-colors ${
+            isActive ? 'bg-gray-700' : ''
+        }`}
+    >
+        {skill}
+    </button>
+));
+SkillTab.displayName = 'SkillTab';
+SkillTab.propTypes = {
+    skill: PropTypes.string.isRequired,
+    isActive: PropTypes.bool.isRequired,
+    onClick: PropTypes.func.isRequired
+};
+
+const SkillContent = memo(({ skillType, skills }) => {
+    const [openSkills, setOpenSkills] = useState({}); // Track open/closed state for each skill
+
+    const toggleSkill = (skillId) => {
+        setOpenSkills(prev => ({
+            ...prev,
+            [skillId]: !prev[skillId]
+        }));
+    };
+
+    return (
+        <div className="bg-gray-800 rounded-lg p-4 mb-4">
+            <h2 className="text-xl font-semibold mb-4 text-blue-500">{skillType}</h2>
+            <div className="grid gap-4">
+                {skills.map((skill, index) => (
+                    <div key={index} className="bg-gray-700 rounded-lg overflow-hidden">
+                        <div 
+                            onClick={() => toggleSkill(index)}
+                            className="flex items-start gap-4 p-4 cursor-pointer hover:bg-gray-600 transition-colors"
+                        >
+                            <img src={skill.image} alt={skill.name} className="w-12 h-12 rounded" />
+                            <h3 className="font-semibold text-white">{skill.name}</h3>
+                        </div>
+                        {openSkills[index] && skill.description && (
+                            <div className="px-4 pb-4 pt-2 border-t border-gray-600">
+                                <p className="text-gray-300">{skill.description}</p>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+});
+SkillContent.displayName = 'SkillContent';
+SkillContent.propTypes = {
+    skillType: PropTypes.string.isRequired,
+    skills: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        image: PropTypes.string.isRequired,
+        description: PropTypes.string
+    }))
+};
+SkillContent.defaultProps = {
+    skills: []
+};
+
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div className="text-red-500 text-center p-4">
+                    Something went wrong. Please try refreshing the page.
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
+ErrorBoundary.propTypes = {
+    children: PropTypes.node.isRequired
+};
 
 const CharacterDetail = () => {
     const { id } = useParams();
@@ -63,156 +290,6 @@ const CharacterDetail = () => {
             </div>
         );
     }
-}
-
-// Update StatRow component to have larger icon
-const StatRow = memo(({ label, value, icon }) => (
-    <div className="flex justify-between items-center p-3 bg-gray-900 border-b border-gray-800">
-        <span className="text-gray-300">{label}</span>
-        <div className="flex items-center gap-2">
-            <span className="text-white">{value}</span>
-            {icon && <img src={icon} alt={value} className="w-8 h-8" />}
-        </div>
-    </div>
-));
-
-const CharacterPortrait = memo(({ character }) => (
-    <div className="w-1/2 relative">
-        <img 
-            src={character.portrait} 
-            alt={character.name} 
-            className="w-full h-auto rounded-md"
-        />
-        <div className="absolute bottom-0 right-0 bg-gray-800/70 backdrop-blur-md p-4 rounded-lg">
-            <p className="text-2xl font-semibold">{character.name}</p>
-            <div className="flex items-center gap-2">
-                <p className="text-lg">{character.Attribute}</p>
-                <img 
-                    src={icondata[character.Attribute]} 
-                    alt={character.Attribute}
-                    className="w-8 h-8"
-                />
-            </div>
-            <div className="flex justify-center gap-1 mt-2">
-                {[...Array(character.Rarity)].map((_, index) => (
-                    <span key={index} className="text-yellow-400 text-xl">★</span>
-                ))}
-            </div>
-        </div>
-    </div>
-));
-
-const StatsPanel = memo(({ character }) => {
-    const levelStats = character.LevelStats?.[0] || {};
-    
-    // Default values for stats
-    const defaultStats = {
-        EnergyRecharge: 100,
-        CritRate: 5,
-        CritDamage: 150
-    };
-
-    return (
-        <div className="w-1/2">
-            <div className="bg-gray-950 rounded-lg overflow-hidden">
-                <div className="p-4">
-                    <h2 className="text-2xl font-bold">Ascension Stats</h2>
-                    <div className="text-blue-500 mb-4">CHARACTER STATS</div>
-                    
-                    <div className="divide-y divide-gray-700 bg-gray-950 rounded-lg">
-                        {Object.entries({
-                            "Level Range": `${levelStats.LevelMin || 1} - ${levelStats.LevelMax || 90}`,
-                            "Current Level": levelStats.Level || "1",
-                            "Rank": levelStats.RankID || "0",
-                            "Base HP": levelStats.HP || "0",
-                            "Base ATK": levelStats.ATK || "0",
-                            "Base DEF": levelStats.DEF || "0",
-                            "Energy Recharge": `${levelStats.EnergyRecharge ?? defaultStats.EnergyRecharge}%`,
-                            "Critical Rate": `${levelStats.CritRate ?? defaultStats.CritRate}%`,
-                            "Critical DMG": `${levelStats.CritDamage ?? defaultStats.CritDamage}%`,
-                            "EXP Required": levelStats.EXP_Required || "0",
-                            "Weapon Type": character.WeaponType,
-                        }).map(([label, value]) => (
-                            <StatRow 
-                                key={label} 
-                                label={label} 
-                                value={value}
-                                icon={label === "Element" ? icondata[value] : null}
-                            />
-                        ))}
-                    </div>
-                </div>
-                <div className="p-4">
-                    <button className="w-full p-3 text-center border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-colors">
-                        {character.CharacterTags?.[0]?.CharacterTags || "No Tag"}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-});
-
-const MaterialsSection = memo(({ title, materials = [] }) => (
-    <div className="w-1/2 p-4 bg-gray-800 rounded-lg">
-        <h2 className="text-xl font-semibold mb-2 text-blue-500">{title}</h2>
-        <div className="grid grid-cols-4 gap-4">
-            {materials.map((material, index) => (
-                <div key={index} className="flex items-center gap-2">
-                    <img src={material.image} alt={material.name} className="w-8 h-8" />
-                    <span className="text-white">{material.name}</span>
-                </div>
-            ))}
-        </div>
-    </div>
-));
-
-const SkillTab = memo(({ skill, isActive, onClick }) => (
-    <button 
-        onClick={onClick}
-        className={`p-2 text-blue-500 font-bold hover:bg-gray-700 rounded-lg transition-colors ${
-            isActive ? 'bg-gray-700' : ''
-        }`}
-    >
-        {skill}
-    </button>
-));
-
-const SkillContent = memo(({ skillType, skills = [] }) => {
-    const [openSkills, setOpenSkills] = useState({}); // Track open/closed state for each skill
-
-    const toggleSkill = (skillId) => {
-        setOpenSkills(prev => ({
-            ...prev,
-            [skillId]: !prev[skillId]
-        }));
-    };
-
-    return (
-        <div className="bg-gray-800 rounded-lg p-4 mb-4">
-            <h2 className="text-xl font-semibold mb-4 text-blue-500">{skillType}</h2>
-            <div className="grid gap-4">
-                {skills.map((skill, index) => (
-                    <div key={index} className="bg-gray-700 rounded-lg overflow-hidden">
-                        <div 
-                            onClick={() => toggleSkill(index)}
-                            className="flex items-start gap-4 p-4 cursor-pointer hover:bg-gray-600 transition-colors"
-                        >
-                            <img src={skill.image} alt={skill.name} className="w-12 h-12 rounded" />
-                            <h3 className="font-semibold text-white">{skill.name}</h3>
-                        </div>
-                        {openSkills[index] && skill.description && (
-                            <div className="px-4 pb-4 pt-2 border-t border-gray-600">
-                                <p className="text-gray-300">{skill.description}</p>
-                            </div>
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-});
-
-
 
     const SKILL_TYPES = [
         'basic-attack',
@@ -225,45 +302,47 @@ const SkillContent = memo(({ skillType, skills = [] }) => {
 
     const formatSkillType = (type) => 
         type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    
+
     return (
-        <div className="bg-gray-900/80 backdrop-blur-sm text-white p-8 max-w-7xl mx-auto mt-14 mb-14 rounded-lg">
-            <div className="flex justify-center gap-8">
-                <CharacterPortrait character={character} />
-                <StatsPanel character={character} />
-            </div>
+        <ErrorBoundary>
+            <div className="bg-gray-900/80 backdrop-blur-sm text-white p-8 max-w-7xl mx-auto mt-14 mb-14 rounded-lg">
+                <div className="flex justify-center gap-8">
+                    <CharacterPortrait character={character} />
+                    <StatsPanel character={character} />
+                </div>
 
-            <div className="flex justify-center gap-8 mt-8">
-                <MaterialsSection title="Materials Needed" />
-                <MaterialsSection title="Ascension Skill Material" />
-            </div>
+                <div className="flex justify-center gap-8 mt-8">
+                    <MaterialsSection title="Materials Needed" />
+                    <MaterialsSection title="Ascension Skill Material" />
+                </div>
 
-            <div className="mt-8">
-                <div className="bg-gray-800 rounded-lg p-4">
-                    <h2 className="text-xl font-bold mb-4 text-blue-400">Skills & Passives</h2>
-                    <div className="flex gap-4 mb-6 overflow-x-auto p-2">
-                        {SKILL_TYPES.map(skill => (
-                            <SkillTab
-                                key={skill}
-                                skill={formatSkillType(skill)}
-                                isActive={selectedSkill === skill}
-                                onClick={() => setSelectedSkill(skill)}
-                            />
-                        ))}
-                    </div>
-                    {SKILL_TYPES.map(skill => 
-                        selectedSkill === skill && (
-                            <SkillContent 
-                                key={skill}
-                                skillType={formatSkillType(skill)}
-                                skills={character[`${skill}Skills`] || []}
-                            />
-                        )
-                    )}
-                </div>  
+                <div className="mt-8">
+                    <div className="bg-gray-800 rounded-lg p-4">
+                        <h2 className="text-xl font-bold mb-4 text-blue-400">Skills & Passives</h2>
+                        <div className="flex gap-4 mb-6 overflow-x-auto p-2">
+                            {SKILL_TYPES.map(skill => (
+                                <SkillTab
+                                    key={skill}
+                                    skill={formatSkillType(skill)}
+                                    isActive={selectedSkill === skill}
+                                    onClick={() => setSelectedSkill(skill)}
+                                />
+                            ))}
+                        </div>
+                        {SKILL_TYPES.map(skill => 
+                            selectedSkill === skill && (
+                                <SkillContent 
+                                    key={skill}
+                                    skillType={formatSkillType(skill)}
+                                    skills={character[`${skill}Skills`] || []}
+                                />
+                            )
+                        )}
+                    </div>  
+                </div>
             </div>
-        </div>
+        </ErrorBoundary>
     );
-
+};
 
 export default CharacterDetail;
