@@ -64,7 +64,6 @@ const CharacterDetail = () => {
         );
     }
 
-   
 
 // Update StatRow component to have larger icon
 const StatRow = memo(({ label, value, icon }) => (
@@ -210,7 +209,8 @@ const SkillContent = memo(({ skillType, skills = [] }) => {
             </div>
         </div>
     );
-});
+    
+);
 
     const SKILL_TYPES = [
         'basic-attack',
@@ -220,7 +220,6 @@ const SkillContent = memo(({ skillType, skills = [] }) => {
         'intro-skill',
         'oturo-skill'
     ];
-
     const formatSkillType = (type) => 
         type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     
@@ -262,5 +261,5 @@ const SkillContent = memo(({ skillType, skills = [] }) => {
             </div>
         </div>
     );
-
+};
 export default CharacterDetail;
