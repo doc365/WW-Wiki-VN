@@ -14,5 +14,11 @@
     ],
     "scripts": {
         "lint": "eslint ."
+    },
+    "dependencies": {
+        "lightningcss-win32-x64-msvc": "latest"
+    },
+    "devDependencies": {
+        "@swc/core-win32-x64-msvc": "latest"
     }
 }
