@@ -26,6 +26,10 @@ const CONFIG = {
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type'],
         credentials: true
+    },
+    CACHE: {
+        MAX_ITEMS: 1000,  // Maximum number of items in cache
+        CLEANUP_INTERVAL: 60000  // Cleanup interval in ms
     }
 };
 
@@ -34,12 +38,15 @@ class Cache {
     constructor(duration) {
         this.store = new Map();
         this.duration = duration;
+        this.stats = { hits: 0, misses: 0 };
         
-        // Cleanup expired entries every minute
-        setInterval(() => this.cleanup(), 60000);
+        setInterval(() => this.cleanup(), CONFIG.CACHE.CLEANUP_INTERVAL);
     }
 
     set(key, value) {
+        if (this.store.size >= CONFIG.CACHE.MAX_ITEMS) {
+            this.evictOldest();
+        }
         this.store.set(key, {
             timestamp: Date.now(),
             data: value
@@ -48,14 +55,38 @@ class Cache {
 
     get(key) {
         const entry = this.store.get(key);
-        if (!entry) return null;
-        
-        if (Date.now() - entry.timestamp > this.duration) {
-            this.store.delete(key);
+        if (!entry) {
+            this.stats.misses++;
             return null;
         }
         
+        if (Date.now() - entry.timestamp > this.duration) {
+            this.store.delete(key);
+            this.stats.misses++;
+            return null;
+        }
+        
+        this.stats.hits++;
         return entry.data;
+    }
+
+    evictOldest() {
+        const oldest = [...this.store.entries()]
+            .reduce((a, b) => a[1].timestamp < b[1].timestamp ? a : b);
+        if (oldest) this.store.delete(oldest[0]);
+    }
+
+    clear() {
+        this.store.clear();
+        this.stats = { hits: 0, misses: 0 };
+    }
+
+    getStats() {
+        return {
+            ...this.stats,
+            size: this.store.size,
+            hitRatio: this.stats.hits / (this.stats.hits + this.stats.misses) || 0
+        };
     }
 
     cleanup() {
