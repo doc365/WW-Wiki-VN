@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-
 import Characters from './Components/Characters/Characters.jsx';
 import CharacterDetail from './Components/Characters/CharacterDetail.jsx';
 import WeaponsList from './Components/Weapon/weaponsList.jsx';
@@ -23,7 +22,7 @@ const App = () => {
   const [backendData, setBackendData] = useState([{}]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api")
+    fetch("http://localhost:5000/api/characters")
       .then(response => response.json())
       .then(data => setBackendData(data))
       .catch(error => console.error('Error fetching data:', error));
